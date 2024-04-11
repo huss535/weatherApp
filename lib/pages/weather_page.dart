@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:weather_app/utilities/bottom_nav.dart';
-import 'package:weather_app/utilities/hourly_temp.dart';
+import 'package:weather_app/utilities/daily_temp.dart';
 
 class WeatherPage extends StatelessWidget {
   WeatherPage({super.key});
@@ -13,7 +13,7 @@ class WeatherPage extends StatelessWidget {
         backgroundColor: Colors.deepPurple,
         elevation: 30.0,
       ),
-      body: HourlyTemp(),
+      body: DailyTemp(),
       bottomNavigationBar: BottomNav(),
     );
   }
