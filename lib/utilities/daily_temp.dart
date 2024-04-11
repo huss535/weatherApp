@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// Component displays weather forecast for days
 class DailyTemp extends StatefulWidget {
   DailyTemp({super.key});
 
@@ -14,6 +15,8 @@ class _DailyTempState extends State<DailyTemp> {
       child: Container(
         height: 100,
         width: 350,
+
+        //Data displayed in component
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -23,6 +26,7 @@ class _DailyTempState extends State<DailyTemp> {
             Text("27°C")
           ],
         ),
+        //Container styling
         decoration: BoxDecoration(
             //126, 74, 221
             boxShadow: [

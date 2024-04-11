@@ -9,6 +9,7 @@ class BottomNav extends StatelessWidget {
     return BottomAppBar(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
+        //Bottom Nav buttons
         children: [
           IconButton(
             iconSize: 40,
