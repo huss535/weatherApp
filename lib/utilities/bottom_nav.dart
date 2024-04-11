@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_app/pages/location_page.dart';
 import 'package:weather_app/pages/weather_page.dart';
 
 class BottomNav extends StatelessWidget {
@@ -22,7 +23,10 @@ class BottomNav extends StatelessWidget {
           IconButton(
             iconSize: 40,
             icon: Icon(Icons.location_pin),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: ((context) => LocationPage())));
+            },
           ),
           IconButton(
             iconSize: 40,
