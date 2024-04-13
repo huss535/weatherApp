@@ -20,10 +20,16 @@ class WeatherPage extends StatelessWidget {
         padding: EdgeInsets.symmetric(vertical: 20),
         child: Center(
           child: SizedBox(
-            width: 350,
+            width: 380,
             child: ListView(
               clipBehavior: Clip.none,
-              children: [MainWeatherWidget()],
+              children: [
+                MainWeatherWidget(),
+                SizedBox(
+                  height: 30,
+                ),
+                WeatherData()
+              ],
             ),
           ),
         ),
@@ -33,6 +39,7 @@ class WeatherPage extends StatelessWidget {
   }
 }
 
+// Weather widget displaying current day weather
 class MainWeatherWidget extends StatefulWidget {
   MainWeatherWidget({super.key});
 
@@ -65,6 +72,51 @@ class _MainWeatherWidgetState extends State<MainWeatherWidget> {
           ],
           borderRadius: BorderRadius.circular(15.0),
           color: Color.fromRGBO(140, 190, 233, 1)),
+    );
+  }
+}
+
+class WeatherData extends StatelessWidget {
+  const WeatherData({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+          height: 90,
+          width: 200,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [Text("Precipitation"), Text("39%")],
+          ),
+          decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                    color: Color.fromRGBO(126, 74, 221, 1),
+                    offset: Offset(-8, 8))
+              ],
+              borderRadius: BorderRadius.circular(15.0),
+              color: Color.fromRGBO(140, 190, 233, 1)),
+        ),
+        Container(
+          height: 90,
+          width: 150,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [Text("Wind Speed"), Text("40 mph")],
+          ),
+          decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                    color: Color.fromRGBO(126, 74, 221, 1),
+                    offset: Offset(-8, 8))
+              ],
+              borderRadius: BorderRadius.circular(15.0),
+              color: Color.fromRGBO(140, 190, 233, 1)),
+        ),
+      ],
     );
   }
 }
