@@ -1,18 +1,33 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:convert';
 
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:weather_app/utilities/bottom_nav.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Page for users to lookup weather based on location
 class LocationPage extends StatelessWidget {
   LocationPage({super.key});
   final myController = TextEditingController();
-
   @override
   void dispose() {
     // Clean up the controller when the widget is removed from the
     // widget tree.
     myController.dispose();
+  }
+
+  Future<http.Response> fetchLocation(String country) async {
+    Map<String, dynamic> queryParams = {
+      'q': country,
+      'appid': dotenv.env["WEATHER_API_KEY"],
+      // Add more parameters if needed
+    };
+    String uri = Uri.parse("http://api.openweathermap.org/geo/1.0/direct")
+        .replace(queryParameters: queryParams)
+        .toString();
+    var respnse = await http.get(Uri.parse(uri));
+    return respnse;
   }
 
   @override
@@ -30,6 +45,21 @@ class LocationPage extends StatelessWidget {
             SearchField(
               myController: myController,
             ),
+            ElevatedButton(
+                onPressed: () async {
+                  try {
+                    final response =
+                        await fetchLocation(myController.text.trim());
+                    if (response.statusCode == 200) {
+                      print(jsonDecode(response.body));
+                    } else {
+                      print('Failed to fetch location: ${response.statusCode}');
+                    }
+                  } catch (e) {
+                    print('Exception occurred: $e');
+                  }
+                },
+                child: Text("Test Env"))
           ],
         ),
       ),
