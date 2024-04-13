@@ -1,9 +1,19 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:weather_app/utilities/bottom_nav.dart';
 
 // Page for users to lookup weather based on location
 class LocationPage extends StatelessWidget {
-  const LocationPage({super.key});
+  LocationPage({super.key});
+  final myController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is removed from the
+    // widget tree.
+    myController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +26,11 @@ class LocationPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(
-          children: [SearchField()],
+          children: [
+            SearchField(
+              myController: myController,
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: BottomNav(),
@@ -27,15 +41,22 @@ class LocationPage extends StatelessWidget {
 
 // Text area component to look up locations
 class SearchField extends StatelessWidget {
-  const SearchField({super.key});
+  TextEditingController myController;
+  SearchField({super.key, required this.myController});
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: myController,
       decoration: InputDecoration(
-          prefix: Icon(Icons.search),
-          filled: true,
-          labelText: "Search locations"),
+        prefix: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Icon(Icons.search),
+        ),
+        filled: true,
+        labelText: "Search locations",
+        hoverColor: Colors.deepPurple,
+      ),
     );
   }
 }
