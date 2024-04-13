@@ -22,7 +22,6 @@ class HourlyTemp extends StatelessWidget {
             color: Color.fromRGBO(140, 190, 233, 1)),
 
         //Data displayed in component
-
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [Text("9:00 am"), Icon(Icons.cloud), Text("27 deg")],
