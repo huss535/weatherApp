@@ -1,8 +1,10 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_const_constructors_in_immutables, sort_child_properties_last
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:weather_app/utilities/bottom_nav.dart';
 import 'package:weather_app/utilities/daily_temp.dart';
+import 'package:http/http.dart' as http;
 
 // Page used to display weather info
 class WeatherPage extends StatelessWidget {
@@ -39,7 +41,7 @@ class WeatherPage extends StatelessWidget {
   }
 }
 
-// Weather widget displaying current day weather
+// Weather widget displaying current day Temprature
 class MainWeatherWidget extends StatefulWidget {
   MainWeatherWidget({super.key});
 
@@ -76,6 +78,7 @@ class _MainWeatherWidgetState extends State<MainWeatherWidget> {
   }
 }
 
+// Widget displaying other weather data
 class WeatherData extends StatelessWidget {
   const WeatherData({super.key});
 
@@ -118,5 +121,28 @@ class WeatherData extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class HourlyTempAll extends StatelessWidget {
+  HourlyTempAll({super.key});
+
+  Future<http.Response> fetchHourlyTemp() {
+    Map<String, dynamic> queryParams = {
+      'lat': -36.852095,
+      'lon': 174.7631803,
+      'units': "metric",
+      'appid': dotenv.env["WEATHER_API_KEY"],
+    };
+
+    Uri uri = Uri.parse("http://api.openweathermap.org/geo/1.0/direct")
+        .replace(queryParameters: queryParams);
+    var response = http.get(uri);
+    return response;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Placeholder();
   }
 }
