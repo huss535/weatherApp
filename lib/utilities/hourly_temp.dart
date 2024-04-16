@@ -4,13 +4,15 @@ import 'package:flutter/widgets.dart';
 
 // Component displays hourly temprature for a day
 class HourlyTemp extends StatelessWidget {
-  HourlyTemp({super.key});
+  String time;
+  String temp;
+  HourlyTemp({required this.time, required this.temp, super.key});
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        height: 200,
+        height: 180,
         width: 120,
         decoration: BoxDecoration(
             //Container styling
@@ -24,7 +26,7 @@ class HourlyTemp extends StatelessWidget {
         //Data displayed in component
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [Text("9:00 am"), Icon(Icons.cloud), Text("27 deg")],
+          children: [Text(time), Icon(Icons.cloud), Text(temp)],
         ),
       ),
     );
