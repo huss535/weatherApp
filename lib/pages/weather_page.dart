@@ -174,8 +174,10 @@ class HourlyTempAll extends StatelessWidget {
           return Text('Error: ${snapshot.error}');
         } else {
           final temps = snapshot.data!;
+
           return SizedBox(
             height: 220,
+            width: 380,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -185,9 +187,10 @@ class HourlyTempAll extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Container(
+                          clipBehavior: Clip.none,
                           width: 100, // Adjust width as needed
                           child: HourlyTemp(
-                              time: "9:00 am",
+                              time: _formatTimestamp(temps[i]["dt"]),
                               temp: '${temps[i]["main"]["temp"]}°C')
                           //Text('T${temps[i]["main"]["temp"]}°C'),
                           ),
@@ -199,5 +202,24 @@ class HourlyTempAll extends StatelessWidget {
         }
       },
     );
+  }
+
+  // Helper function to format timestamp to time
+  String _formatTimestamp(int timestamp) {
+    // Convert timestamp to DateTime object
+    DateTime dateTime =
+        DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: true);
+    // Convert DateTime object to local time
+    dateTime = dateTime.toLocal();
+    TimeOfDay displayedHour =
+        TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
+
+    //print(displayedHour);
+
+    // Format time
+    // Example format: "9:00"
+    return displayedHour.hour.toString().padLeft(2, "0") +
+        ":" +
+        displayedHour.minute.toString().padLeft(2, "0");
   }
 }
