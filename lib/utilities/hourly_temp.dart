@@ -12,7 +12,7 @@ class HourlyTemp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        height: 180,
+        height: 160,
         width: 120,
         decoration: BoxDecoration(
             //Container styling

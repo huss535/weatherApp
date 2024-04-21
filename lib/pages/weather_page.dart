@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, sort_child_properties_last
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -5,7 +7,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:weather_app/utilities/bottom_nav.dart';
 import 'package:http/http.dart' as http;
+import 'package:weather_app/utilities/daily_temp.dart';
 import 'package:weather_app/utilities/hourly_temp.dart';
+import 'package:weather_app/utilities/responsive_padding.dart';
 
 class WeatherPage extends StatelessWidget {
   const WeatherPage({Key? key}) : super(key: key);
@@ -21,31 +25,30 @@ class WeatherPage extends StatelessWidget {
         backgroundColor: Colors.deepPurple,
         elevation: 30.0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+      body: ResponsivePadding(
         child: Center(
           child: SizedBox(
             width: 380,
             child: ListView(
               clipBehavior: Clip.none,
-              children: const [
+              children: [
                 MainWeatherWidget(),
                 SizedBox(height: 40),
                 WeatherData(),
                 SizedBox(height: 40),
-                HourlyTempAll(),
+                DailyTempAll()
               ],
             ),
           ),
         ),
       ),
-      bottomNavigationBar: const BottomNav(),
+      bottomNavigationBar: BottomNav(),
     );
   }
 }
 
 class MainWeatherWidget extends StatelessWidget {
-  const MainWeatherWidget({Key? key}) : super(key: key);
+  MainWeatherWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +56,7 @@ class MainWeatherWidget extends StatelessWidget {
       height: 150,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: const [
+        children: [
           Text(
             "29 C",
             style: TextStyle(fontSize: 46),
@@ -176,16 +179,16 @@ class HourlyTempAll extends StatelessWidget {
           final temps = snapshot.data!;
 
           return SizedBox(
-            height: 220,
+            height: 180,
             width: 380,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (int i = 0; i < temps.length; i++)
+                  for (int i = 0; i < 3; i++)
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: Container(
                           clipBehavior: Clip.none,
                           width: 100, // Adjust width as needed
@@ -203,23 +206,140 @@ class HourlyTempAll extends StatelessWidget {
       },
     );
   }
+}
 
-  // Helper function to format timestamp to time
-  String _formatTimestamp(int timestamp) {
-    // Convert timestamp to DateTime object
-    DateTime dateTime =
-        DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: true);
-    // Convert DateTime object to local time
-    dateTime = dateTime.toLocal();
-    TimeOfDay displayedHour =
-        TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
+class DailyTempService {
+  static Future<List<dynamic>> fetchDailyTemp(double lat, double lon) async {
+    final queryParams = {
+      'lat': lat.toString(),
+      'lon': lon.toString(),
+      'units': "metric",
+      'appid': dotenv.env["WEATHER_API_KEY"],
+    };
 
-    //print(displayedHour);
+    final uri =
+        Uri.parse("https://api.openweathermap.org/data/2.5/forecast/daily")
+            .replace(queryParameters: queryParams);
 
-    // Format time
-    // Example format: "9:00"
-    return displayedHour.hour.toString().padLeft(2, "0") +
-        ":" +
-        displayedHour.minute.toString().padLeft(2, "0");
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+
+      final List<dynamic> dailyData = jsonData['list'];
+      print(dailyData);
+      return dailyData;
+    } else {
+      throw Exception('Failed to load hourly temperature');
+    }
+  }
+}
+
+class DailyTempAll extends StatelessWidget {
+  const DailyTempAll({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<dynamic>>(
+      future: DailyTempService.fetchDailyTemp(-36.852095, 174.7631803),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('Error: ${snapshot.error}'),
+          );
+        } else {
+          final temps = snapshot.data!;
+
+          return SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
+              children: [
+                for (int i = 0; i < temps.length; i++)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 18.0),
+                    child: DailyTemp(
+                      min: '${temps[i]["temp"]["min"]}°C',
+                      max: '${temps[i]["temp"]["max"]}°C',
+                      day: _getDayOfWeek(DateTime.fromMillisecondsSinceEpoch(
+                          temps[i]["dt"] * 1000)),
+                    ),
+                  ),
+              ],
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  String _getDayOfWeek(DateTime date) {
+    switch (date.weekday) {
+      case 1:
+        return 'Monday';
+      case 2:
+        return 'Tuesday';
+      case 3:
+        return 'Wednesday';
+      case 4:
+        return 'Thursday';
+      case 5:
+        return 'Friday';
+      case 6:
+        return 'Saturday';
+      case 7:
+        return 'Sunday';
+      default:
+        return '';
+    }
+  }
+}
+
+// Helper function to format timestamp to time
+String _formatTimestamp(int timestamp) {
+  // Convert timestamp to DateTime object
+  DateTime dateTime =
+      DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: true);
+  // Convert DateTime object to local time
+  dateTime = dateTime.toLocal();
+  TimeOfDay displayedHour =
+      TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
+
+  //print(displayedHour);
+
+  // Format time
+  // Example format: "9:00"
+  return displayedHour.hour.toString().padLeft(2, "0") +
+      ":" +
+      displayedHour.minute.toString().padLeft(2, "0");
+}
+
+String _getDay(int timestamp) {
+  // Convert timestamp to DateTime object
+  DateTime dateTime =
+      DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: true);
+  // Convert DateTime object to local time
+  dateTime = dateTime.toLocal();
+  int weekday = dateTime.weekday;
+  switch (weekday) {
+    case 1:
+      return 'Monday';
+    case 2:
+      return 'Tuesday';
+    case 3:
+      return 'Wednesday';
+    case 4:
+      return 'Thursday';
+    case 5:
+      return 'Friday';
+    case 6:
+      return 'Saturday';
+    case 7:
+      return 'Sunday';
+    default:
+      return '';
   }
 }
