@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 
 // Component displays hourly temprature for a day
 class HourlyTemp extends StatelessWidget {
@@ -31,4 +35,95 @@ class HourlyTemp extends StatelessWidget {
       ),
     );
   }
+}
+
+class HourlyTempService {
+  static Future<List<dynamic>> fetchHourlyTemp(double lat, double lon) async {
+    final queryParams = {
+      'lat': lat.toString(),
+      'lon': lon.toString(),
+      'units': "metric",
+      'appid': dotenv.env["WEATHER_API_KEY"],
+    };
+
+    final uri =
+        Uri.parse("https://pro.openweathermap.org/data/2.5/forecast/hourly")
+            .replace(queryParameters: queryParams);
+
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+
+      final List<dynamic> hourlyData = jsonData['list'];
+
+      return hourlyData;
+    } else {
+      throw Exception('Failed to load hourly temperature');
+    }
+  }
+}
+
+class HourlyTempAll extends StatelessWidget {
+  const HourlyTempAll({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<dynamic>>(
+      future: HourlyTempService.fetchHourlyTemp(-36.852095, 174.7631803),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          final temps = snapshot.data!;
+
+          return SizedBox(
+            height: 180,
+            width: 380,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (int i = 0; i < 3; i++)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Container(
+                          clipBehavior: Clip.none,
+                          width: 100, // Adjust width as needed
+                          child: HourlyTemp(
+                              time: _formatTimestamp(temps[i]["dt"]),
+                              temp: '${temps[i]["main"]["temp"]}°C')
+                          //Text('T${temps[i]["main"]["temp"]}°C'),
+                          ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+}
+
+// Helper function to format timestamp to time
+String _formatTimestamp(int timestamp) {
+  // Convert timestamp to DateTime object
+  DateTime dateTime =
+      DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: true);
+  // Convert DateTime object to local time
+  dateTime = dateTime.toLocal();
+  TimeOfDay displayedHour =
+      TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
+
+  //print(displayedHour);
+
+  // Format time
+  // Example format: "9:00"
+  return displayedHour.hour.toString().padLeft(2, "0") +
+      ":" +
+      displayedHour.minute.toString().padLeft(2, "0");
 }
