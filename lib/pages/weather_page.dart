@@ -5,17 +5,43 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:weather_app/utilities/bottom_nav.dart';
 import 'package:http/http.dart' as http;
 import 'package:weather_app/utilities/daily_temp.dart';
 import 'package:weather_app/utilities/hourly_temp.dart';
 import 'package:weather_app/utilities/responsive_padding.dart';
 
+Future<Position> _getLocation() async {
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    return Future.error("Location services disabled");
+  }
+  LocationPermission permission = await Geolocator.checkPermission();
+
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      return Future.error("Location permissions are denied");
+    }
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    return Future.error(
+        "Location permissions are denied forever, we can not process your request");
+  }
+
+  return await Geolocator.getCurrentPosition();
+}
+
 class WeatherPage extends StatelessWidget {
   const WeatherPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    _getLocation()
+        .then((value) => {print(value.latitude), print(value.longitude)});
+
     final now = DateTime.now();
     final date = DateTime(now.year, now.month, now.day);
 
@@ -36,7 +62,7 @@ class WeatherPage extends StatelessWidget {
                 SizedBox(height: 40),
                 WeatherData(),
                 SizedBox(height: 40),
-                DailyTempAll()
+                // DailyTempAll()
               ],
             ),
           ),
@@ -68,10 +94,11 @@ class MainWeatherWidget extends StatelessWidget {
         ],
       ),
       decoration: BoxDecoration(
+        border: Border.all(width: 2),
         boxShadow: [
           BoxShadow(
             color: const Color.fromRGBO(126, 74, 221, 1),
-            offset: const Offset(-8, 8),
+            offset: const Offset(0, 8),
           ),
         ],
         borderRadius: BorderRadius.circular(15.0),
@@ -100,10 +127,11 @@ class WeatherData extends StatelessWidget {
             ],
           ),
           decoration: BoxDecoration(
+            border: Border.all(width: 2),
             boxShadow: [
               BoxShadow(
                 color: const Color.fromRGBO(126, 74, 221, 1),
-                offset: const Offset(-8, 8),
+                offset: const Offset(0, 8),
               ),
             ],
             borderRadius: BorderRadius.circular(15.0),
@@ -121,10 +149,11 @@ class WeatherData extends StatelessWidget {
             ],
           ),
           decoration: BoxDecoration(
+            border: Border.all(width: 2),
             boxShadow: [
               BoxShadow(
                 color: const Color.fromRGBO(126, 74, 221, 1),
-                offset: const Offset(-8, 8),
+                offset: const Offset(0, 8),
               ),
             ],
             borderRadius: BorderRadius.circular(15.0),
