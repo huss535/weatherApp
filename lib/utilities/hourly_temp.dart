@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'helper_functions.dart';
 
 // Component displays hourly temprature for a day
 class HourlyTemp extends StatelessWidget {
@@ -94,7 +95,7 @@ class HourlyTempAll extends StatelessWidget {
                           clipBehavior: Clip.none,
                           width: 100, // Adjust width as needed
                           child: HourlyTemp(
-                              time: _formatTimestamp(temps[i]["dt"]),
+                              time: formatTimestamp(temps[i]["dt"]),
                               temp: '${temps[i]["main"]["temp"]}°C')
                           //Text('T${temps[i]["main"]["temp"]}°C'),
                           ),
@@ -110,20 +111,3 @@ class HourlyTempAll extends StatelessWidget {
 }
 
 // Helper function to format timestamp to time
-String _formatTimestamp(int timestamp) {
-  // Convert timestamp to DateTime object
-  DateTime dateTime =
-      DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: true);
-  // Convert DateTime object to local time
-  dateTime = dateTime.toLocal();
-  TimeOfDay displayedHour =
-      TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
-
-  //print(displayedHour);
-
-  // Format time
-  // Example format: "9:00"
-  return displayedHour.hour.toString().padLeft(2, "0") +
-      ":" +
-      displayedHour.minute.toString().padLeft(2, "0");
-}

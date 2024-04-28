@@ -5,67 +5,97 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:weather_app/utilities/bottom_nav.dart';
 import 'package:http/http.dart' as http;
 import 'package:weather_app/utilities/daily_temp.dart';
 import 'package:weather_app/utilities/hourly_temp.dart';
-import 'package:weather_app/utilities/responsive_padding.dart';
+import 'package:weather_app/utilities/helper_functions.dart';
+// Helper function that fetches current location from user
 
-Future<Position> _getLocation() async {
-  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    return Future.error("Location services disabled");
+//The main weather page
+class WeatherPage extends StatefulWidget {
+  WeatherPage({Key? key}) : super(key: key);
+
+  @override
+  State<WeatherPage> createState() => _WeatherPageState();
+}
+
+class _WeatherPageState extends State<WeatherPage> {
+  String lat = "";
+  String long = "";
+  late String locationName = "";
+  late String temp = "";
+  late String weatherInfo = "";
+  late String windSpeed = "";
+
+  @override
+  void initState() {
+    super.initState();
+    // Call the async method in initState
+    _fetchCurrentWeather();
   }
-  LocationPermission permission = await Geolocator.checkPermission();
 
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      return Future.error("Location permissions are denied");
+  // function to fetch today's weather info
+  Future<void> _fetchCurrentWeather() async {
+    try {
+      var location = await getLocation();
+      final queryParams = {
+        'lat': location.latitude.toString(),
+        'lon': location.longitude.toString(),
+        'units': "metric",
+        'appid': dotenv.env["WEATHER_API_KEY"],
+      };
+      final uri = Uri.parse("https://api.openweathermap.org/data/2.5/weather")
+          .replace(queryParameters: queryParams);
+      final response = await http.get(uri);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        setState(() {
+          temp = data["main"]["temp"].toString();
+          weatherInfo = data["weather"][0]["description"].toString();
+          windSpeed = data["wind"]["speed"].toString();
+          locationName =
+              '${data["name"].toString()}, ${data["sys"]["country"].toString()}';
+        });
+      } else {
+        throw Exception("Failed to retrieve today's weather data");
+      }
+    } catch (e) {
+      print("Error fetching weather data: $e");
     }
   }
 
-  if (permission == LocationPermission.deniedForever) {
-    return Future.error(
-        "Location permissions are denied forever, we can not process your request");
-  }
-
-  return await Geolocator.getCurrentPosition();
-}
-
-class WeatherPage extends StatelessWidget {
-  const WeatherPage({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    _getLocation()
-        .then((value) => {print(value.latitude), print(value.longitude)});
-
-    final now = DateTime.now();
-    final date = DateTime(now.year, now.month, now.day);
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Auckland'),
+        title: Text(locationName),
         backgroundColor: Colors.deepPurple,
         elevation: 30.0,
       ),
-      body: ResponsivePadding(
+      body: Padding(
+        padding: EdgeInsetsDirectional.only(top: 20),
         child: Center(
-          child: SizedBox(
-            width: 380,
-            child: ListView(
-              clipBehavior: Clip.none,
-              children: [
-                MainWeatherWidget(),
-                SizedBox(height: 40),
-                WeatherData(),
-                SizedBox(height: 40),
-                // DailyTempAll()
-              ],
-            ),
-          ),
+          child: (temp.isEmpty || weatherInfo.isEmpty || windSpeed.isEmpty)
+              ? CircularProgressIndicator() // Show loading indicator if data is not available
+              : SizedBox(
+                  width: 380,
+                  child: ListView(
+                    clipBehavior: Clip.none,
+                    children: [
+                      MainWeatherWidget(
+                        temp: temp,
+                      ),
+                      SizedBox(height: 40),
+                      WeatherData(
+                        weatherInfo: weatherInfo,
+                        windSpeed: windSpeed,
+                      ),
+                      SizedBox(height: 40),
+                      // DailyTempAll()
+                    ],
+                  ),
+                ),
         ),
       ),
       bottomNavigationBar: BottomNav(),
@@ -73,8 +103,10 @@ class WeatherPage extends StatelessWidget {
   }
 }
 
+//Widget displaying temprature of the day
 class MainWeatherWidget extends StatelessWidget {
-  MainWeatherWidget({Key? key}) : super(key: key);
+  String temp;
+  MainWeatherWidget({required this.temp, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +116,7 @@ class MainWeatherWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Text(
-            "29 C",
+            "${temp}°C",
             style: TextStyle(fontSize: 46),
           ),
           Icon(
@@ -109,7 +141,10 @@ class MainWeatherWidget extends StatelessWidget {
 }
 
 class WeatherData extends StatelessWidget {
-  const WeatherData({Key? key}) : super(key: key);
+  String weatherInfo;
+  String windSpeed;
+  WeatherData({required this.weatherInfo, required this.windSpeed, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -121,9 +156,9 @@ class WeatherData extends StatelessWidget {
           width: 200,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: const [
-              Text("Precipitation"),
-              Text("39%"),
+            children: [
+              Text("Today"),
+              Text(weatherInfo),
             ],
           ),
           decoration: BoxDecoration(
@@ -143,9 +178,9 @@ class WeatherData extends StatelessWidget {
           width: 150,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: const [
+            children: [
               Text("Wind Speed"),
-              Text("40 mph"),
+              Text(windSpeed),
             ],
           ),
           decoration: BoxDecoration(
