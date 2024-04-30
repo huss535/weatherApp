@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
+import 'helper_functions.dart';
+
+//Individual daily weather component
 class DailyTemp extends StatelessWidget {
   final String min;
   final String max;
@@ -58,6 +61,7 @@ class DailyTemp extends StatelessWidget {
   }
 }
 
+// Contains method which fetches daily weather data
 class DailyTempService {
   static Future<List<dynamic>> fetchDailyTemp(double lat, double lon) async {
     final queryParams = {
@@ -85,6 +89,7 @@ class DailyTempService {
   }
 }
 
+// Generates the daily weather widgets dynamically
 class DailyTempAll extends StatelessWidget {
   const DailyTempAll({Key? key}) : super(key: key);
 
@@ -114,7 +119,7 @@ class DailyTempAll extends StatelessWidget {
                     child: DailyTemp(
                       min: '${temps[i]["temp"]["min"]}°C',
                       max: '${temps[i]["temp"]["max"]}°C',
-                      day: _getDayOfWeek(DateTime.fromMillisecondsSinceEpoch(
+                      day: getDayOfWeek(DateTime.fromMillisecondsSinceEpoch(
                           temps[i]["dt"] * 1000)),
                     ),
                   ),
@@ -124,26 +129,5 @@ class DailyTempAll extends StatelessWidget {
         }
       },
     );
-  }
-
-  String _getDayOfWeek(DateTime date) {
-    switch (date.weekday) {
-      case 1:
-        return 'Monday';
-      case 2:
-        return 'Tuesday';
-      case 3:
-        return 'Wednesday';
-      case 4:
-        return 'Thursday';
-      case 5:
-        return 'Friday';
-      case 6:
-        return 'Saturday';
-      case 7:
-        return 'Sunday';
-      default:
-        return '';
-    }
   }
 }

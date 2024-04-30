@@ -20,14 +20,16 @@ class HourlyTemp extends StatelessWidget {
         height: 160,
         width: 120,
         decoration: BoxDecoration(
-            //Container styling
-            boxShadow: [
-              BoxShadow(
-                  color: Color.fromRGBO(126, 74, 221, 1), offset: Offset(-8, 8))
-            ],
-            borderRadius: BorderRadius.circular(15.0),
-            color: Color.fromRGBO(140, 190, 233, 1)),
-
+          border: Border.all(color: Colors.black, width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: Color.fromRGBO(126, 74, 221, 1),
+              offset: Offset(0, 8),
+            )
+          ],
+          borderRadius: BorderRadius.circular(15.0),
+          color: Color.fromRGBO(140, 190, 233, 1),
+        ),
         //Data displayed in component
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -88,7 +90,7 @@ class HourlyTempAll extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (int i = 0; i < 3; i++)
+                  for (int i = 0; i < 24; i++)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: Container(
@@ -96,7 +98,7 @@ class HourlyTempAll extends StatelessWidget {
                           width: 100, // Adjust width as needed
                           child: HourlyTemp(
                               time: formatTimestamp(temps[i]["dt"]),
-                              temp: '${temps[i]["main"]["temp"]}°C')
+                              temp: '${temps[i]["main"]["temp"].round()}°C')
                           //Text('T${temps[i]["main"]["temp"]}°C'),
                           ),
                     ),

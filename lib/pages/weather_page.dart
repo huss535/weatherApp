@@ -92,7 +92,9 @@ class _WeatherPageState extends State<WeatherPage> {
                         windSpeed: windSpeed,
                       ),
                       SizedBox(height: 40),
-                      // DailyTempAll()
+                      HourlyTempAll(),
+                      SizedBox(height: 40),
+                      DailyTempAll()
                     ],
                   ),
                 ),
@@ -180,7 +182,7 @@ class WeatherData extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Text("Wind Speed"),
-              Text(windSpeed),
+              Text('${windSpeed} m/s'),
             ],
           ),
           decoration: BoxDecoration(
