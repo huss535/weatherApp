@@ -7,6 +7,13 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'helper_functions.dart';
 
+class HourlyTempData {
+  String temp;
+  String hour;
+
+  HourlyTempData({required this.temp, required this.hour});
+}
+
 // Component displays hourly temprature for a day
 class HourlyTemp extends StatelessWidget {
   String time;
@@ -40,11 +47,32 @@ class HourlyTemp extends StatelessWidget {
   }
 }
 
-class HourlyTempService {
-  static Future<List<dynamic>> fetchHourlyTemp(double lat, double lon) async {
+class HourlyTempAll extends StatefulWidget {
+  String lat;
+  String long;
+
+  HourlyTempAll({required this.lat, required this.long, Key? key})
+      : super(key: key);
+
+  @override
+  State<HourlyTempAll> createState() => _HourlyTempAllState();
+}
+
+class _HourlyTempAllState extends State<HourlyTempAll> {
+  late List<HourlyTempData> temps;
+  bool _dataFetched = false; // Flag to track whether data has been fetched
+
+  @override
+  void initState() {
+    super.initState();
+    temps = []; // Initialize temps list
+    _fetchHourlyTemp();
+  }
+
+  Future<void> _fetchHourlyTemp() async {
     final queryParams = {
-      'lat': lat.toString(),
-      'lon': lon.toString(),
+      'lat': widget.lat,
+      'lon': widget.long,
       'units': "metric",
       'appid': dotenv.env["WEATHER_API_KEY"],
     };
@@ -59,57 +87,65 @@ class HourlyTempService {
       final jsonData = jsonDecode(response.body);
 
       final List<dynamic> hourlyData = jsonData['list'];
+      List<HourlyTempData> tempList = [];
 
-      return hourlyData;
+      for (int i = 0; i < 24; i++) {
+        HourlyTempData entry = HourlyTempData(
+          temp: hourlyData[i]["main"]["temp"].round().toString(),
+          hour: formatTimestamp(hourlyData[i]["dt"]),
+        );
+        tempList.add(entry);
+      }
+      print("Hourly");
+      setState(() {
+        temps = tempList;
+        _dataFetched = true;
+      });
     } else {
       throw Exception('Failed to load hourly temperature');
     }
   }
-}
-
-class HourlyTempAll extends StatelessWidget {
-  const HourlyTempAll({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<dynamic>>(
-      future: HourlyTempService.fetchHourlyTemp(-36.852095, 174.7631803),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else {
-          final temps = snapshot.data!;
-
-          return SizedBox(
-            height: 180,
-            width: 380,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (int i = 0; i < 24; i++)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Container(
-                          clipBehavior: Clip.none,
-                          width: 100, // Adjust width as needed
-                          child: HourlyTemp(
-                              time: formatTimestamp(temps[i]["dt"]),
-                              temp: '${temps[i]["main"]["temp"].round()}°C')
-                          //Text('T${temps[i]["main"]["temp"]}°C'),
-                          ),
-                    ),
-                ],
-              ),
-            ),
+    return _dataFetched
+        ? _HourlyTempList(temps: temps)
+        : Center(
+            child: CircularProgressIndicator(),
           );
-        }
-      },
-    );
   }
 }
 
-// Helper function to format timestamp to time
+class _HourlyTempList extends StatelessWidget {
+  final List<HourlyTempData> temps;
+
+  const _HourlyTempList({Key? key, required this.temps}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 180,
+      width: 380,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (int i = 0; i < temps.length; i++)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Container(
+                  clipBehavior: Clip.none,
+                  width: 100, // Adjust width as needed
+                  child: HourlyTemp(
+                    time: temps[i].hour,
+                    temp: '${temps[i].temp}°C',
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
