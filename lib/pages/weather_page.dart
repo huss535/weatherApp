@@ -70,10 +70,7 @@ class WeatherPage extends StatelessWidget {
                         long: snapshot.data?["long"] ?? "",
                       ),
                       SizedBox(height: 40),
-                      DailyTempAll(
-                        lat: snapshot.data?["lat"] ?? "",
-                        long: snapshot.data?["long"] ?? "",
-                      ),
+                      DailyTempAll(),
                     ],
                   ),
                 ),
