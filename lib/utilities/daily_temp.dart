@@ -1,40 +1,95 @@
+// ignore_for_file: prefer_const_constructors, sort_child_properties_last
+
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:weather_app/providers/weather_data_provider.dart';
 
-// Component displays weather forecast for days
-class DailyTemp extends StatefulWidget {
-  DailyTemp({super.key});
+import 'helper_functions.dart';
 
-  @override
-  State<DailyTemp> createState() => _DailyTempState();
-}
+//Individual daily weather component
+class DailyTemp extends StatelessWidget {
+  final String min;
+  final String max;
+  final String day;
 
-class _DailyTempState extends State<DailyTemp> {
+  const DailyTemp({
+    required this.min,
+    required this.max,
+    required this.day,
+    Key? key,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Container(
         height: 100,
         width: 350,
-
-        //Data displayed in component
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Text("Monday"),
+            Text(
+              day,
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            ),
             Icon(Icons.cloud_queue_outlined),
-            Text("Percp 38%"),
-            Text("27°C")
+            Text(
+              min,
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            ),
+            Text(
+              max,
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            )
           ],
         ),
-        //Container styling
         decoration: BoxDecoration(
-            //126, 74, 221
-            boxShadow: [
-              BoxShadow(
-                  color: Color.fromRGBO(126, 74, 221, 1), offset: Offset(-8, 8))
-            ],
-            borderRadius: BorderRadius.circular(15.0),
-            color: Color.fromRGBO(140, 190, 233, 1)),
+          border: Border.all(color: Colors.black, width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: Color.fromRGBO(126, 74, 221, 1),
+              offset: Offset(0, 8),
+            )
+          ],
+          borderRadius: BorderRadius.circular(15.0),
+          color: Color.fromRGBO(140, 190, 233, 1),
+        ),
+      ),
+    );
+  }
+}
+
+// Generates the daily weather widgets dynamically
+class DailyTempAll extends StatefulWidget {
+  DailyTempAll({Key? key}) : super(key: key);
+
+  @override
+  State<DailyTempAll> createState() => _DailyTempAllState();
+}
+
+class _DailyTempAllState extends State<DailyTempAll> {
+  @override
+  Widget build(BuildContext context) {
+    final providerWeather = Provider.of<WeatherDataProvider>(context);
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Column(
+        children: [
+          for (int i = 0; i < providerWeather.dailyTempList.length; i++)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 18.0),
+              child: DailyTemp(
+                min: '${providerWeather.dailyTempList[i].tempMin}°C',
+                max: '${providerWeather.dailyTempList[i].tempMax}°C',
+                day: providerWeather.dailyTempList[i].dayOfWeek,
+              ),
+            ),
+        ],
       ),
     );
   }
