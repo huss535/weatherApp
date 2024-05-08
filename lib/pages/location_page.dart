@@ -2,13 +2,67 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import 'package:weather_app/utilities/bottom_nav.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Page for users to lookup weather based on location
-class LocationPage extends StatelessWidget {
+class LocationPage extends StatefulWidget {
   LocationPage({super.key});
-  final myController = TextEditingController();
+
+  @override
+  State<LocationPage> createState() => _LocationPageState();
+}
+
+class _LocationPageState extends State<LocationPage> {
+  List<dynamic> _placeList = [];
+  final _myController = TextEditingController();
+
+  String? _sessionToken;
+  final uuid = Uuid();
+
+  void _onChanged() {
+    if (_sessionToken == null) {
+      setState(() {
+        _sessionToken = uuid.v4();
+      });
+    }
+
+    getSuggestion(_myController.text);
+  }
+
+  void getSuggestion(String input) async {
+    String? kPLACES_API_KEY = dotenv.env["MAPS_API_KEY"];
+    String type = '(regions)';
+    String baseURL =
+        'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+
+    final queryParams = {
+      'input': input,
+      'key': kPLACES_API_KEY,
+      'sessiontoken': "_sessionToken",
+    };
+
+    Uri placesApiCall =
+        Uri.parse(baseURL).replace(queryParameters: queryParams);
+
+    http.Response response = await http.get(placesApiCall);
+    if (response.statusCode == 200) {
+      setState(() {
+        _placeList = json.decode(response.body)['predictions'];
+      });
+    } else {
+      throw Exception('Failed to load predictions');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _myController.addListener(() {
+      _onChanged();
+    });
+  }
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +77,17 @@ class LocationPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SearchField(
-              myController: myController,
+              myController: _myController,
+            ),
+            ListView.builder(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: _placeList.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(_placeList[index]["description"]),
+                );
+              },
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 20),
