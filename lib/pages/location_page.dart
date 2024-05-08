@@ -9,27 +9,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class LocationPage extends StatelessWidget {
   LocationPage({super.key});
   final myController = TextEditingController();
-  @override
-  void dispose() {
-    // Clean up the controller when the widget is removed from the
-    // widget tree.
-    myController.dispose();
-  }
 
-  Future<http.Response> fetchLocation(String country) async {
-    Map<String, dynamic> queryParams = {
-      'q': country,
-      'appid': dotenv.env["WEATHER_API_KEY"],
-      // Add more parameters if needed
-    };
-    String uri = Uri.parse("http://api.openweathermap.org/geo/1.0/direct")
-        .replace(queryParameters: queryParams)
-        .toString();
-    var respnse = await http.get(Uri.parse(uri));
-    return respnse;
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -40,25 +20,30 @@ class LocationPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SearchField(
               myController: myController,
             ),
-            ElevatedButton(
-                onPressed: () async {
-                  try {
-                    final response =
-                        await fetchLocation(myController.text.trim());
-                    if (response.statusCode == 200) {
-                      print(jsonDecode(response.body));
-                    } else {
-                      print('Failed to fetch location: ${response.statusCode}');
-                    }
-                  } catch (e) {
-                    print('Exception occurred: $e');
-                  }
-                },
-                child: Text("Test Env"))
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.only(
+                          left: 29, right: 29, top: 15, bottom: 15),
+                      backgroundColor: Color.fromRGBO(140, 190, 233, 1),
+                      //elevation: 5,
+                      shadowColor: Color.fromRGBO(157, 12, 12, 1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        side: BorderSide(color: Colors.black, width: 2),
+                      )),
+                  onPressed: () {},
+                  child: Text(
+                    "Lookup location",
+                    style: TextStyle(color: Colors.black),
+                  )),
+            )
           ],
         ),
       ),
