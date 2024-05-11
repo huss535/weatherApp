@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:weather_app/pages/location_page.dart';
 import 'package:weather_app/pages/weather_page.dart';
 import 'package:weather_app/providers/weather_data_provider.dart';
 
@@ -20,11 +21,14 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => WeatherDataProvider(),
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Weather Wizard',
         theme: ThemeData(
             // Your theme configurations
             ),
-        home: WeatherPage(),
+        routes: {
+          "/": (context) => WeatherPage(),
+          "/locationWeather": (context) => LocationPage()
+        },
         debugShowCheckedModeBanner: false,
       ),
     );

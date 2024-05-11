@@ -36,6 +36,7 @@ class WeatherPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(ModalRoute.of(context)!.settings.arguments);
     return FutureBuilder(
       future: _setLocation(),
       builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {

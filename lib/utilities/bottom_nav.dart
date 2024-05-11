@@ -10,6 +10,7 @@ class BottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const unusedData = IconThemeData(color: Colors.deepPurple);
+
     return BottomNavigationBar(
       backgroundColor: Color(0xC0C0C0FF),
       unselectedIconTheme: unusedData,
@@ -35,10 +36,7 @@ class BottomNav extends StatelessWidget {
         // Handle navigation based on the index
         switch (index) {
           case 0:
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => WeatherPage()),
-            );
+            Navigator.pushNamed(context, "/");
             break;
           case 1:
             Navigator.push(
