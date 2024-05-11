@@ -2,8 +2,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:weather_app/pages/weather_page.dart';
+import 'package:weather_app/providers/weather_data_provider.dart';
 import 'package:weather_app/utilities/bottom_nav.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -68,8 +70,10 @@ class _LocationPageState extends State<LocationPage> {
   }
 
   void _selectLocation(String id) {
-    selectedLocationId = id;
-    Navigator.pushNamed(context, "/", arguments: selectedLocationId);
+    Provider.of<WeatherDataProvider>(context, listen: false)
+        .updateLocationId(id);
+
+    Navigator.pushNamed(context, "/");
   }
 
   Widget build(BuildContext context) {

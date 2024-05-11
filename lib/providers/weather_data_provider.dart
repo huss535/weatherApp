@@ -40,8 +40,9 @@ class DailyTempData {
 
 class WeatherDataProvider extends ChangeNotifier {
   String _lat = "";
-  String _long = "";
+  String _long = ""; // Co-ordinates used in APIs
   String _locationName = "";
+  String? locationId;
 
   MainWidgetData mainWidgetData = MainWidgetData();
   List<HourlyTempData> tempList = [];
@@ -51,18 +52,45 @@ class WeatherDataProvider extends ChangeNotifier {
     _initialize();
   }
   Future<void> _initialize() async {
-    await _setLocation();
     await _fetchCurrentWeather();
     await _fetchHourlyTemp();
     await _fetchDailyTemp();
   }
 
-  Future<void> _setLocation() async {
-    Position location = await getLocation();
-    _lat = location.latitude.toString();
-    _long = location.longitude.toString();
+//sets the current location co-ordinates to be used to fetch weather data
+  Future<void> _setLocation(String? placeId) async {
+    if (placeId == null) {
+      Position location = await getLocation();
+      _lat = location.latitude.toString();
+      _long = location.longitude.toString();
+    } else {
+      try {
+        final queryParams = {
+          "place_id": placeId,
+          "key": dotenv.env["MAPS_API_KEY"]
+        };
+
+        print("Parameters: ${queryParams.toString()}");
+
+        Uri coordinatesCall =
+            Uri.parse("https://maps.googleapis.com/maps/api/place/details/json")
+                .replace(queryParameters: queryParams);
+
+        http.Response response = await http.get(coordinatesCall);
+        if (response.statusCode == 200) {
+          Map<String, dynamic> data = jsonDecode(response.body);
+          _lat = data["result"]["geometry"]["location"]["lat"].toString();
+          _long = data["result"]["geometry"]["location"]["lng"].toString();
+        } else {
+          throw Exception("Failed to retrieve location through maps");
+        }
+      } catch (e) {
+        rethrow;
+      }
+    }
+
     List<Placemark> placemarks =
-        await placemarkFromCoordinates(location.latitude, location.longitude);
+        await placemarkFromCoordinates(double.parse(_lat), double.parse(_long));
 
     _locationName = "Unknown Location";
     if (placemarks.isNotEmpty) {
@@ -72,7 +100,15 @@ class WeatherDataProvider extends ChangeNotifier {
     }
   }
 
+  void updateLocationId(newLocationId) async {
+    locationId = newLocationId;
+    await _fetchCurrentWeather();
+    await _fetchHourlyTemp();
+    await _fetchDailyTemp();
+  }
+
   Future<void> _fetchCurrentWeather() async {
+    await _setLocation(locationId);
     try {
       final queryParams = {
         'lat': _lat,
@@ -91,6 +127,8 @@ class WeatherDataProvider extends ChangeNotifier {
         mainWidgetData.weatherInfo = data["weather"][0]["description"];
         mainWidgetData.windSpeed = data["wind"]["speed"].toString();
         notifyListeners();
+        // Reverting to current location after displaying searched location weather
+        locationId = null;
       } else {
         throw Exception("Failed to retrieve today's weather data");
       }
