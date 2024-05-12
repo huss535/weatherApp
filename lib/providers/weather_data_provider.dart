@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geocoding/geocoding.dart';
@@ -7,42 +6,14 @@ import 'package:geolocator/geolocator.dart';
 import 'package:weather_app/utilities/helper_functions.dart';
 import 'package:http/http.dart' as http;
 
-// class for data needed for main widgets component
-class MainWidgetData {
-  String? locationName = "";
-  String? temp = "";
-  String? weatherInfo = "";
-  String? windSpeed = "";
-
-  MainWidgetData(
-      {this.locationName, this.temp, this.weatherInfo, this.windSpeed});
-}
-
-// class for data needed for hourly temprature widget
-class HourlyTempData {
-  String temp;
-  String hour;
-
-  HourlyTempData({required this.temp, required this.hour});
-}
-
-//class for data needed for daily temprature widget
-class DailyTempData {
-  String tempMin;
-  String tempMax;
-  String dayOfWeek;
-
-  DailyTempData(
-      {required this.tempMin, required this.tempMax, required this.dayOfWeek});
-}
-
-// Central class for fetching data from the openweather API
-
 class WeatherDataProvider extends ChangeNotifier {
   String _lat = "";
   String _long = ""; // Co-ordinates used in APIs
   String _locationName = "";
   String? locationId;
+
+  //used primarily for UI
+  bool isLoading = true;
 
   MainWidgetData mainWidgetData = MainWidgetData();
   List<HourlyTempData> tempList = [];
@@ -52,9 +23,11 @@ class WeatherDataProvider extends ChangeNotifier {
     _initialize();
   }
   Future<void> _initialize() async {
+    await _setLocation(locationId);
     await _fetchCurrentWeather();
     await _fetchHourlyTemp();
     await _fetchDailyTemp();
+    isLoading = false;
   }
 
 //sets the current location co-ordinates to be used to fetch weather data
@@ -92,23 +65,25 @@ class WeatherDataProvider extends ChangeNotifier {
     List<Placemark> placemarks =
         await placemarkFromCoordinates(double.parse(_lat), double.parse(_long));
 
-    _locationName = "Unknown Location";
     if (placemarks.isNotEmpty) {
       Placemark locationInfo = placemarks[0];
-      _locationName =
+      mainWidgetData.locationName =
           '${locationInfo.locality ?? ""}, ${locationInfo.country ?? ""}';
+      notifyListeners();
     }
   }
 
-  void updateLocationId(newLocationId) async {
-    locationId = newLocationId;
+  Future<void> updateLocationId(newLocationId) async {
+    isLoading = true;
+    await _setLocation(newLocationId);
     await _fetchCurrentWeather();
     await _fetchHourlyTemp();
     await _fetchDailyTemp();
+    locationId = null;
+    isLoading = false;
   }
 
   Future<void> _fetchCurrentWeather() async {
-    await _setLocation(locationId);
     try {
       final queryParams = {
         'lat': _lat,
@@ -123,12 +98,11 @@ class WeatherDataProvider extends ChangeNotifier {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
         mainWidgetData.locationName = _locationName;
-        mainWidgetData.temp = data["main"]["temp"].toString();
+        mainWidgetData.temp = data["main"]["temp"].round().toString();
         mainWidgetData.weatherInfo = data["weather"][0]["description"];
         mainWidgetData.windSpeed = data["wind"]["speed"].toString();
         notifyListeners();
         // Reverting to current location after displaying searched location weather
-        locationId = null;
       } else {
         throw Exception("Failed to retrieve today's weather data");
       }

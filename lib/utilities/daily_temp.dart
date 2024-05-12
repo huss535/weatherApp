@@ -65,7 +65,8 @@ class DailyTemp extends StatelessWidget {
 
 // Generates the daily weather widgets dynamically
 class DailyTempAll extends StatefulWidget {
-  DailyTempAll({Key? key}) : super(key: key);
+  final List<DailyTempData> dailyTempList;
+  DailyTempAll({required this.dailyTempList, Key? key}) : super(key: key);
 
   @override
   State<DailyTempAll> createState() => _DailyTempAllState();
@@ -74,19 +75,17 @@ class DailyTempAll extends StatefulWidget {
 class _DailyTempAllState extends State<DailyTempAll> {
   @override
   Widget build(BuildContext context) {
-    final providerWeather = Provider.of<WeatherDataProvider>(context);
-
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: Column(
         children: [
-          for (int i = 0; i < providerWeather.dailyTempList.length; i++)
+          for (int i = 0; i < widget.dailyTempList.length; i++)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 18.0),
               child: DailyTemp(
-                min: '${providerWeather.dailyTempList[i].tempMin}°C',
-                max: '${providerWeather.dailyTempList[i].tempMax}°C',
-                day: providerWeather.dailyTempList[i].dayOfWeek,
+                min: '${widget.dailyTempList[i].tempMin}°C',
+                max: '${widget.dailyTempList[i].tempMax}°C',
+                day: widget.dailyTempList[i].dayOfWeek,
               ),
             ),
         ],

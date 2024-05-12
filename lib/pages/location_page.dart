@@ -69,8 +69,8 @@ class _LocationPageState extends State<LocationPage> {
     });
   }
 
-  void _selectLocation(String id) {
-    Provider.of<WeatherDataProvider>(context, listen: false)
+  void _selectLocation(String id) async {
+    await Provider.of<WeatherDataProvider>(context, listen: false)
         .updateLocationId(id);
 
     Navigator.pushNamed(context, "/");
@@ -84,7 +84,7 @@ class _LocationPageState extends State<LocationPage> {
         elevation: 30.0,
       ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        // mainAxisAlignment: MainAxisAlignment,
         children: [
           SearchField(
             myController: _myController,

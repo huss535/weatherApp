@@ -43,11 +43,8 @@ class HourlyTemp extends StatelessWidget {
 }
 
 class HourlyTempAll extends StatefulWidget {
-  String lat;
-  String long;
-
-  HourlyTempAll({required this.lat, required this.long, Key? key})
-      : super(key: key);
+  final List<HourlyTempData> tempList;
+  HourlyTempAll({required this.tempList, Key? key}) : super(key: key);
 
   @override
   State<HourlyTempAll> createState() => _HourlyTempAllState();
@@ -56,9 +53,6 @@ class HourlyTempAll extends StatefulWidget {
 class _HourlyTempAllState extends State<HourlyTempAll> {
   @override
   Widget build(BuildContext context) {
-    print("Hourly");
-    final providerWeather = Provider.of<WeatherDataProvider>(context);
-
     return SizedBox(
       height: 180,
       width: 380,
@@ -67,15 +61,15 @@ class _HourlyTempAllState extends State<HourlyTempAll> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            for (int i = 0; i < providerWeather.tempList.length; i++)
+            for (int i = 0; i < widget.tempList.length; i++)
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10.0),
                 child: Container(
                   clipBehavior: Clip.none,
                   width: 100, // Adjust width as needed
                   child: HourlyTemp(
-                    time: providerWeather.tempList[i].hour,
-                    temp: '${providerWeather.tempList[i].temp}°C',
+                    time: widget.tempList[i].hour,
+                    temp: '${widget.tempList[i].temp}°C',
                   ),
                 ),
               ),

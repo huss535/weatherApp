@@ -1,6 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
+class MainWidgetData {
+  String? locationName = "";
+  String? temp = "";
+  String? weatherInfo = "";
+  String? windSpeed = "";
+
+  MainWidgetData(
+      {this.locationName, this.temp, this.weatherInfo, this.windSpeed});
+}
+
+// class for data needed for hourly temprature widget
+class HourlyTempData {
+  String temp;
+  String hour;
+
+  HourlyTempData({required this.temp, required this.hour});
+}
+
+//class for data needed for daily temprature widget
+class DailyTempData {
+  String tempMin;
+  String tempMax;
+  String dayOfWeek;
+
+  DailyTempData(
+      {required this.tempMin, required this.tempMax, required this.dayOfWeek});
+}
+
 String formatTimestamp(int timestamp) {
   // Convert timestamp to DateTime object
   DateTime dateTime =

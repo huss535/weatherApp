@@ -5,26 +5,13 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:weather_app/providers/weather_data_provider.dart';
+import 'package:weather_app/utilities/helper_functions.dart';
 
-class MainWidgetData {
-  String locationName = "";
-  String temp = "";
-  String weatherInfo = "";
-  String windSpeed = "";
-
-  MainWidgetData(
-      {required this.locationName,
-      required this.temp,
-      required this.weatherInfo,
-      required this.windSpeed});
-}
-
-// representing the main weather widget for current weather
+// representing the main weather widget for current weather, contains the other widgets displaying the current weather
 
 class MainWidgets extends StatefulWidget {
-  String lat;
-  String long;
-  MainWidgets({required this.lat, required this.long, super.key});
+  final MainWidgetData mainWidgetData;
+  MainWidgets({required this.mainWidgetData, super.key});
 
   @override
   State<MainWidgets> createState() => _MainWidgetsState();
@@ -38,18 +25,16 @@ class _MainWidgetsState extends State<MainWidgets> {
 
   @override
   Widget build(BuildContext context) {
-    final providerWeather = Provider.of<WeatherDataProvider>(context);
-
     // Build UI with fetched data
     return Container(
       height: 300,
       child: Column(
         children: [
-          MainWeatherWidget(temp: providerWeather.mainWidgetData.temp ?? ""),
+          MainWeatherWidget(temp: widget.mainWidgetData.temp ?? ""),
           SizedBox(height: 40),
           WeatherData(
-            weatherInfo: providerWeather.mainWidgetData.weatherInfo ?? "",
-            windSpeed: providerWeather.mainWidgetData.windSpeed ?? "",
+            weatherInfo: widget.mainWidgetData.weatherInfo ?? "",
+            windSpeed: widget.mainWidgetData.windSpeed ?? "",
           ),
         ],
       ),
