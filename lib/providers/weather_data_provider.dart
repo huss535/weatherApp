@@ -9,7 +9,6 @@ import 'package:http/http.dart' as http;
 class WeatherDataProvider extends ChangeNotifier {
   String _lat = "";
   String _long = ""; // Co-ordinates used in APIs
-  String _locationName = "";
   String? locationId;
 
   //used primarily for UI
@@ -22,6 +21,12 @@ class WeatherDataProvider extends ChangeNotifier {
   WeatherDataProvider() {
     _initialize();
   }
+// function used with the weather button on the bottom nav
+  void toWeather(BuildContext context) {
+    _initialize();
+    Navigator.pushNamed(context, "/");
+  }
+
   Future<void> _initialize() async {
     await _setLocation(locationId);
     await _fetchCurrentWeather();
@@ -97,7 +102,6 @@ class WeatherDataProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
-        mainWidgetData.locationName = _locationName;
         mainWidgetData.temp = data["main"]["temp"].round().toString();
         mainWidgetData.weatherInfo = data["weather"][0]["description"];
         mainWidgetData.windSpeed = data["wind"]["speed"].toString();
@@ -132,7 +136,7 @@ class WeatherDataProvider extends ChangeNotifier {
       final jsonData = jsonDecode(response.body);
 
       final List<dynamic> hourlyData = jsonData['list'];
-
+      tempList.clear();
       for (int i = 0; i < 24; i++) {
         HourlyTempData entry = HourlyTempData(
           temp: hourlyData[i]["main"]["temp"].round().toString(),
@@ -165,6 +169,7 @@ class WeatherDataProvider extends ChangeNotifier {
 
       final List<dynamic> dailyData = jsonData['list'];
 
+      dailyTempList.clear();
       for (int i = 0; i < 7; i++) {
         DailyTempData entry = DailyTempData(
           tempMin: dailyData[i]["temp"]["min"].round().toString(),

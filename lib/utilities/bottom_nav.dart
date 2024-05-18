@@ -1,14 +1,18 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:weather_app/pages/location_page.dart';
 import 'package:weather_app/pages/weather_page.dart';
+import 'package:weather_app/providers/weather_data_provider.dart';
 
 class BottomNav extends StatelessWidget {
   const BottomNav({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    WeatherDataProvider weatherProvider =
+        Provider.of<WeatherDataProvider>(context);
     const unusedData = IconThemeData(color: Colors.deepPurple);
 
     return BottomNavigationBar(
@@ -36,7 +40,8 @@ class BottomNav extends StatelessWidget {
         // Handle navigation based on the index
         switch (index) {
           case 0:
-            Navigator.pushNamed(context, "/");
+            weatherProvider.toWeather(context);
+            /* Navigator.pushNamed(context, "/"); */
             break;
           case 1:
             Navigator.push(
