@@ -23,6 +23,7 @@ class WeatherDataProvider extends ChangeNotifier {
   }
 // function used with the weather button on the bottom nav
   void toWeather(BuildContext context) {
+    isLoading = true;
     _initialize();
     Navigator.pushNamed(context, "/");
   }
@@ -105,6 +106,7 @@ class WeatherDataProvider extends ChangeNotifier {
         mainWidgetData.temp = data["main"]["temp"].round().toString();
         mainWidgetData.weatherInfo = data["weather"][0]["description"];
         mainWidgetData.windSpeed = data["wind"]["speed"].toString();
+        mainWidgetData.iconCode = data["weather"][0]["icon"];
         notifyListeners();
         // Reverting to current location after displaying searched location weather
       } else {
@@ -141,6 +143,7 @@ class WeatherDataProvider extends ChangeNotifier {
         HourlyTempData entry = HourlyTempData(
           temp: hourlyData[i]["main"]["temp"].round().toString(),
           hour: formatTimestamp(hourlyData[i]["dt"]),
+          iconCode: hourlyData[i]["weather"][0]["icon"].toString(),
         );
         tempList.add(entry);
       }
@@ -176,6 +179,7 @@ class WeatherDataProvider extends ChangeNotifier {
           tempMax: dailyData[i]["temp"]["max"].round().toString(),
           dayOfWeek: getDayOfWeek(
               DateTime.fromMillisecondsSinceEpoch(dailyData[i]["dt"] * 1000)),
+          iconCode: dailyData[i]["weather"][0]["icon"],
         );
         dailyTempList.add(entry);
       }

@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:weather_icons/weather_icons.dart';
 
 class MainWidgetData {
-  String? locationName = "";
-  String? temp = "";
-  String? weatherInfo = "";
-  String? windSpeed = "";
+  String locationName;
+  String temp;
+  String weatherInfo;
+  String windSpeed;
+  String iconCode; // Stores the code used to assign the correct weather icon
 
   MainWidgetData(
-      {this.locationName, this.temp, this.weatherInfo, this.windSpeed});
+      {this.locationName = "",
+      this.temp = "",
+      this.weatherInfo = "",
+      this.windSpeed = "",
+      this.iconCode = ""});
 }
 
 // class for data needed for hourly temprature widget
 class HourlyTempData {
   String temp;
   String hour;
+  String iconCode; // Stores the code used to assign the correct weather icon
 
-  HourlyTempData({required this.temp, required this.hour});
+  HourlyTempData({required this.temp, required this.hour, this.iconCode = ""});
 }
 
 //class for data needed for daily temprature widget
@@ -24,9 +31,13 @@ class DailyTempData {
   String tempMin;
   String tempMax;
   String dayOfWeek;
+  String iconCode;
 
   DailyTempData(
-      {required this.tempMin, required this.tempMax, required this.dayOfWeek});
+      {required this.tempMin,
+      required this.tempMax,
+      required this.dayOfWeek,
+      this.iconCode = ""});
 }
 
 String formatTimestamp(int timestamp) {
@@ -87,5 +98,43 @@ String getDayOfWeek(DateTime date) {
       return 'Sunday';
     default:
       return '';
+  }
+}
+
+// funtion that maps current weather with correct icon
+IconData getWeatherIcon(String iconCode) {
+  switch (iconCode) {
+    case '01d':
+      return WeatherIcons.day_sunny;
+    case '01n':
+      return WeatherIcons.night_clear;
+    case '02d':
+      return WeatherIcons.day_cloudy;
+    case '02n':
+      return WeatherIcons.night_alt_cloudy;
+    case '03d':
+    case '03n':
+      return WeatherIcons.cloud;
+    case '04d':
+    case '04n':
+      return WeatherIcons.cloudy;
+    case '09d':
+    case '09n':
+      return WeatherIcons.showers;
+    case '10d':
+      return WeatherIcons.day_rain;
+    case '10n':
+      return WeatherIcons.night_alt_rain;
+    case '11d':
+    case '11n':
+      return WeatherIcons.thunderstorm;
+    case '13d':
+    case '13n':
+      return WeatherIcons.snow;
+    case '50d':
+    case '50n':
+      return WeatherIcons.fog;
+    default:
+      return WeatherIcons.na;
   }
 }

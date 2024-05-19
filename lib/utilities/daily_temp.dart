@@ -7,6 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:weather_app/providers/weather_data_provider.dart';
+import 'package:weather_icons/weather_icons.dart';
 
 import 'helper_functions.dart';
 
@@ -15,16 +16,18 @@ class DailyTemp extends StatelessWidget {
   final String min;
   final String max;
   final String day;
-
+  final String iconCode;
   const DailyTemp({
     required this.min,
     required this.max,
     required this.day,
+    this.iconCode = "",
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    IconData icon = getWeatherIcon(iconCode);
     return Center(
       child: Container(
         height: 100,
@@ -32,11 +35,17 @@ class DailyTemp extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Text(
-              day,
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            Padding(
+              padding: const EdgeInsets.all(0.0),
+              child: SizedBox(
+                width: 100,
+                child: Text(
+                  day,
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                ),
+              ),
             ),
-            Icon(Icons.cloud_queue_outlined),
+            BoxedIcon(icon),
             Text(
               min,
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
@@ -86,6 +95,7 @@ class _DailyTempAllState extends State<DailyTempAll> {
                 min: '${widget.dailyTempList[i].tempMin}°C',
                 max: '${widget.dailyTempList[i].tempMax}°C',
                 day: widget.dailyTempList[i].dayOfWeek,
+                iconCode: widget.dailyTempList[i].iconCode,
               ),
             ),
         ],

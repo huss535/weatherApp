@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:weather_app/providers/weather_data_provider.dart';
 import 'package:weather_app/utilities/helper_functions.dart';
+import 'package:weather_icons/weather_icons.dart';
 
 // representing the main weather widget for current weather, contains the other widgets displaying the current weather
 
@@ -30,7 +33,10 @@ class _MainWidgetsState extends State<MainWidgets> {
       height: 300,
       child: Column(
         children: [
-          MainWeatherWidget(temp: widget.mainWidgetData.temp ?? ""),
+          MainWeatherWidget(
+            temp: widget.mainWidgetData.temp,
+            iconCode: widget.mainWidgetData.iconCode,
+          ),
           SizedBox(height: 40),
           WeatherData(
             weatherInfo: widget.mainWidgetData.weatherInfo ?? "",
@@ -48,25 +54,14 @@ class _MainWidgetsState extends State<MainWidgets> {
 //Widget displaying temprature of the day
 class MainWeatherWidget extends StatelessWidget {
   final String temp;
-  const MainWeatherWidget({required this.temp, Key? key}) : super(key: key);
-
+  final String iconCode;
+  const MainWeatherWidget({required this.temp, this.iconCode = "", Key? key})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
+    IconData icon = getWeatherIcon(iconCode);
     return Container(
       height: 150,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Text(
-            "${temp}°C",
-            style: TextStyle(fontSize: 46),
-          ),
-          Icon(
-            Icons.sunny,
-            size: 55,
-          )
-        ],
-      ),
       decoration: BoxDecoration(
         border: Border.all(width: 2),
         boxShadow: [
@@ -77,6 +72,19 @@ class MainWeatherWidget extends StatelessWidget {
         ],
         borderRadius: BorderRadius.circular(15.0),
         color: const Color.fromRGBO(140, 190, 233, 1),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Text(
+            "${temp}°C",
+            style: TextStyle(fontSize: 46),
+          ),
+          BoxedIcon(
+            icon,
+            size: 55,
+          )
+        ],
       ),
     );
   }

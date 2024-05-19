@@ -7,16 +7,20 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:weather_app/providers/weather_data_provider.dart';
+import 'package:weather_icons/weather_icons.dart';
 import 'helper_functions.dart';
 
 // Component displays hourly temprature for a day
 class HourlyTemp extends StatelessWidget {
   String time;
   String temp;
-  HourlyTemp({required this.time, required this.temp, super.key});
+  String iconCode;
+  HourlyTemp(
+      {required this.time, required this.temp, this.iconCode = "", super.key});
 
   @override
   Widget build(BuildContext context) {
+    IconData icon = getWeatherIcon(iconCode);
     return Center(
       child: Container(
         height: 160,
@@ -35,7 +39,7 @@ class HourlyTemp extends StatelessWidget {
         //Data displayed in component
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [Text(time), Icon(Icons.cloud), Text(temp)],
+          children: [Text(time), BoxedIcon(icon), Text(temp)],
         ),
       ),
     );
@@ -70,6 +74,7 @@ class _HourlyTempAllState extends State<HourlyTempAll> {
                   child: HourlyTemp(
                     time: widget.tempList[i].hour,
                     temp: '${widget.tempList[i].temp}°C',
+                    iconCode: widget.tempList[i].iconCode,
                   ),
                 ),
               ),
