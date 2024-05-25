@@ -14,6 +14,11 @@ class WeatherDataProvider extends ChangeNotifier {
   //used primarily for UI
   bool isLoading = true;
 
+// Getter function for current location coordinates.
+  List<String> getCoordinates() {
+    return [_lat, _long];
+  }
+
   MainWidgetData mainWidgetData = MainWidgetData();
   List<HourlyTempData> tempList = [];
   List<DailyTempData> dailyTempList = [];
@@ -25,7 +30,7 @@ class WeatherDataProvider extends ChangeNotifier {
   void toWeather(BuildContext context) {
     isLoading = true;
     _initialize();
-    Navigator.pushNamed(context, "/");
+    //Navigator.pushNamed(context, "/weatherPage");
   }
 
   Future<void> _initialize() async {
@@ -73,8 +78,10 @@ class WeatherDataProvider extends ChangeNotifier {
 
     if (placemarks.isNotEmpty) {
       Placemark locationInfo = placemarks[0];
-      mainWidgetData.locationName =
-          '${locationInfo.locality ?? ""}, ${locationInfo.country ?? ""}';
+
+      mainWidgetData.locationName = locationInfo.locality != ""
+          ? '${locationInfo.locality ?? ""}, ${locationInfo.country ?? ""}'
+          : locationInfo.country ?? "";
       notifyListeners();
     }
   }

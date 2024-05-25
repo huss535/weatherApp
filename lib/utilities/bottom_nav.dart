@@ -1,47 +1,58 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weather_app/pages/location_page.dart';
 import 'package:weather_app/pages/weather_page.dart';
 import 'package:weather_app/providers/weather_data_provider.dart';
 
-class BottomNav extends StatelessWidget {
+class BottomNav extends StatefulWidget {
   const BottomNav({Key? key}) : super(key: key);
+
+  @override
+  State<BottomNav> createState() => _BottomNavState();
+}
+
+class _BottomNavState extends State<BottomNav> {
+  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     WeatherDataProvider weatherProvider =
         Provider.of<WeatherDataProvider>(context);
-    const unusedData = IconThemeData(color: Colors.deepPurple);
 
     return BottomNavigationBar(
-      backgroundColor: Color(0xC0C0C0FF),
-      unselectedIconTheme: unusedData,
-      iconSize: 40,
-      elevation: 30,
+      type: BottomNavigationBarType.fixed,
+      fixedColor: Colors.purple,
 
-      //Bottom Nav buttons
+      iconSize: 40,
+      elevation: 0,
+      currentIndex: _currentIndex,
+
+      // Bottom Nav buttons
       items: [
         BottomNavigationBarItem(
           icon: Icon(Icons.sunny),
-          label: 'Weather', // Provide labels for better accessibility
+          label: 'Weather',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.location_pin),
           label: 'Location',
         ),
         BottomNavigationBarItem(
+          icon: Icon(Icons.map_outlined),
+          label: 'Map',
+        ),
+        BottomNavigationBarItem(
           icon: Icon(Icons.settings),
           label: 'Settings',
-        )
+        ),
       ],
       onTap: (int index) {
-        // Handle navigation based on the index
+        setState(() {
+          _currentIndex = index;
+        });
         switch (index) {
           case 0:
             weatherProvider.toWeather(context);
-            /* Navigator.pushNamed(context, "/"); */
             break;
           case 1:
             Navigator.push(
@@ -50,7 +61,10 @@ class BottomNav extends StatelessWidget {
             );
             break;
           case 2:
-            // Handle settings button press
+            // Implement navigation for Map page
+            break;
+          case 3:
+            // Implement navigation for Settings page
             break;
         }
       },

@@ -76,9 +76,8 @@ class _WeatherPageState extends State<WeatherPage> {
             ),
           );
         }
-        return Center(child: Text("Something seems to be wrong"));
       }),
-      bottomNavigationBar: BottomNav(),
+      /*      bottomNavigationBar: BottomNav(), */
     );
   }
 }

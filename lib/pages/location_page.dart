@@ -125,9 +125,8 @@ class _LocationPageState extends State<LocationPage> {
             ) */
         ],
       ),
-      bottomNavigationBar: BottomNav(),
+      /* bottomNavigationBar: BottomNav(), */
     );
-    ;
   }
 }
 
