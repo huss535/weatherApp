@@ -4,10 +4,9 @@ A Flutter based mobile weather app.
 
 ## Phase 1
 
-- Enable users to get weather information over different time intervals.
 - Users can search for different locations and get weather info.
 - Basic settings page.
-- Users can get personalised messages based on weather.
+- Users can get personalised messages based on AI assistant choice.
 
 ## Phase 2
 - Check for improvements across code base.
@@ -20,6 +19,4 @@ A Flutter based mobile weather app.
 
 ## APIs
 - Openweather api
-  
-## App UI design
-- [Figma prototype](https://www.figma.com/file/AqtSyroJbwmGedcbzTqUPp/Weather-app?type=design&node-id=0-1&mode=design&t=GMxaGoAC5Zso8lp2-0)
+- Google maps API
