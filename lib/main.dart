@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:weather_app/pages/location_page.dart';
 import 'package:weather_app/pages/map_page.dart';
 import 'package:weather_app/pages/weather_page.dart';
+import 'package:weather_app/providers/navigation_provider.dart';
 import 'package:weather_app/providers/weather_data_provider.dart';
-import 'package:weather_app/utilities/bottom_nav.dart';
 
 Future main() async {
   WidgetsFlutterBinding
@@ -20,10 +20,10 @@ Future main() async {
 
 class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
+
   void _provideApiKeyToIos() {
     const platform = MethodChannel('com.example.app/google_maps');
     final apiKey = dotenv.env['MAPS_API_KEY'];
-
     platform.invokeMethod('provideApiKey', {'apiKey': apiKey});
   }
 
@@ -31,19 +31,24 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     _provideApiKeyToIos();
 
-    return ChangeNotifierProvider(
-      create: (context) => WeatherDataProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => WeatherDataProvider()),
+        ChangeNotifierProvider(create: (context) => NavigationProvider()),
+      ],
       child: MaterialApp(
         title: 'Weather Wizard',
         theme: ThemeData(
             // Your theme configurations
             ),
-        routes: {
-          "/": (context) => HomePage(),
-          "/weatherPage": (context) => WeatherPage(),
-          "/locationWeather": (context) => LocationPage()
-        },
         debugShowCheckedModeBanner: false,
+        initialRoute: '/',
+        routes: {
+          '/': (context) => HomePage(),
+          '/weatherPage': (context) => WeatherPage(),
+          '/locationWeather': (context) => LocationPage(),
+          // Add more routes as needed
+        },
       ),
     );
   }
@@ -57,26 +62,26 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _currentIndex = 0;
-  final List<Widget> _pages = [WeatherPage(), LocationPage(), MapPage()];
   @override
   Widget build(BuildContext context) {
-    WeatherDataProvider weatherProvider =
-        Provider.of<WeatherDataProvider>(context);
+    final navigationProvider = Provider.of<NavigationProvider>(context);
+    final weatherDataProvider = Provider.of<WeatherDataProvider>(context);
     return Scaffold(
       body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
+        index: navigationProvider.currentIndex,
+        children: [
+          WeatherPage(),
+          LocationPage(),
+          MapPage(),
+          // Add your SettingsPage here if you have one
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         fixedColor: Colors.purple,
-
         iconSize: 40,
         elevation: 0,
-        currentIndex: _currentIndex,
-
-        // Bottom Nav buttons
+        currentIndex: navigationProvider.currentIndex,
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.sunny),
@@ -96,34 +101,11 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
         onTap: (int index) {
-          switch (index) {
-            case 0:
-              weatherProvider.toWeather(context);
-              setState(() {
-                _currentIndex = index;
-              });
-              break;
-            case 1:
-              /*  Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LocationPage()),
-              ); */
-              setState(() {
-                _currentIndex = index;
-              });
-              break;
-            case 2:
-              // Implement navigation for Map page
-              setState(() {
-                _currentIndex = index;
-              });
-              break;
-            case 3:
-              // Implement navigation for Settings page
-              setState(() {
-                _currentIndex = index;
-              });
-              break;
+          if (index == 0) {
+            weatherDataProvider.toWeather();
+            navigationProvider.setIndex(index);
+          } else {
+            navigationProvider.setIndex(index);
           }
         },
       ),

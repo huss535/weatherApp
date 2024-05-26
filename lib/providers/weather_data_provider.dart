@@ -26,75 +26,6 @@ class WeatherDataProvider extends ChangeNotifier {
   WeatherDataProvider() {
     _initialize();
   }
-// function used with the weather button on the bottom nav
-  void toWeather(BuildContext context) {
-    isLoading = true;
-    _initialize();
-    //Navigator.pushNamed(context, "/weatherPage");
-  }
-
-  Future<void> _initialize() async {
-    await _setLocation(locationId);
-    await _fetchCurrentWeather();
-    await _fetchHourlyTemp();
-    await _fetchDailyTemp();
-    isLoading = false;
-  }
-
-//sets the current location co-ordinates to be used to fetch weather data
-  Future<void> _setLocation(String? placeId) async {
-    if (placeId == null) {
-      Position location = await getLocation();
-      _lat = location.latitude.toString();
-      _long = location.longitude.toString();
-    } else {
-      try {
-        final queryParams = {
-          "place_id": placeId,
-          "key": dotenv.env["MAPS_API_KEY"]
-        };
-
-        print("Parameters: ${queryParams.toString()}");
-
-        Uri coordinatesCall =
-            Uri.parse("https://maps.googleapis.com/maps/api/place/details/json")
-                .replace(queryParameters: queryParams);
-
-        http.Response response = await http.get(coordinatesCall);
-        if (response.statusCode == 200) {
-          Map<String, dynamic> data = jsonDecode(response.body);
-          _lat = data["result"]["geometry"]["location"]["lat"].toString();
-          _long = data["result"]["geometry"]["location"]["lng"].toString();
-        } else {
-          throw Exception("Failed to retrieve location through maps");
-        }
-      } catch (e) {
-        rethrow;
-      }
-    }
-
-    List<Placemark> placemarks =
-        await placemarkFromCoordinates(double.parse(_lat), double.parse(_long));
-
-    if (placemarks.isNotEmpty) {
-      Placemark locationInfo = placemarks[0];
-
-      mainWidgetData.locationName = locationInfo.locality != ""
-          ? '${locationInfo.locality ?? ""}, ${locationInfo.country ?? ""}'
-          : locationInfo.country ?? "";
-      notifyListeners();
-    }
-  }
-
-  Future<void> updateLocationId(newLocationId) async {
-    isLoading = true;
-    await _setLocation(newLocationId);
-    await _fetchCurrentWeather();
-    await _fetchHourlyTemp();
-    await _fetchDailyTemp();
-    locationId = null;
-    isLoading = false;
-  }
 
   Future<void> _fetchCurrentWeather() async {
     try {
@@ -114,6 +45,7 @@ class WeatherDataProvider extends ChangeNotifier {
         mainWidgetData.weatherInfo = data["weather"][0]["description"];
         mainWidgetData.windSpeed = data["wind"]["speed"].toString();
         mainWidgetData.iconCode = data["weather"][0]["icon"];
+        print(mainWidgetData.weatherInfo);
         notifyListeners();
         // Reverting to current location after displaying searched location weather
       } else {
@@ -193,6 +125,100 @@ class WeatherDataProvider extends ChangeNotifier {
       notifyListeners();
     } else {
       throw Exception('Failed to load hourly temperature');
+    }
+  }
+
+// function used with the weather button on the bottom nav
+  void toWeather() {
+    isLoading = true;
+    _initialize();
+    //Navigator.pushNamed(context, "/weatherPage");
+  }
+
+  Future<void> _initialize() async {
+    await _setLocation(locationId);
+    await _fetchCurrentWeather();
+    await _fetchHourlyTemp();
+    await _fetchDailyTemp();
+    isLoading = false;
+  }
+
+//sets the current location co-ordinates to be used to fetch weather data
+  Future<void> _setLocation(String? placeId) async {
+    if (placeId == null) {
+      Position location = await getLocation();
+      _lat = location.latitude.toString();
+      _long = location.longitude.toString();
+    } else {
+      try {
+        final queryParams = {
+          "place_id": placeId,
+          "key": dotenv.env["MAPS_API_KEY"]
+        };
+
+        // print("Parameters: ${queryParams.toString()}");
+
+        Uri coordinatesCall =
+            Uri.parse("https://maps.googleapis.com/maps/api/place/details/json")
+                .replace(queryParameters: queryParams);
+
+        http.Response response = await http.get(coordinatesCall);
+        if (response.statusCode == 200) {
+          Map<String, dynamic> data = jsonDecode(response.body);
+          _lat = data["result"]["geometry"]["location"]["lat"].toString();
+          _long = data["result"]["geometry"]["location"]["lng"].toString();
+        } else {
+          throw Exception("Failed to retrieve location through maps");
+        }
+      } catch (e) {
+        rethrow;
+      }
+    }
+
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(double.parse(_lat), double.parse(_long));
+
+    if (placemarks.isNotEmpty) {
+      Placemark locationInfo = placemarks[0];
+
+      mainWidgetData.locationName = locationInfo.locality != ""
+          ? '${locationInfo.locality ?? ""}, ${locationInfo.country ?? ""}'
+          : locationInfo.country ?? "";
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateLocationId(newLocationId) async {
+    isLoading = true;
+    await _setLocation(newLocationId);
+    await _fetchCurrentWeather();
+    await _fetchHourlyTemp();
+    await _fetchDailyTemp();
+    locationId = null;
+    isLoading = false;
+  }
+
+  Future<void> updateLocationIdWithCoordinates(String lat, String long) async {
+    isLoading = true;
+    _lat = lat;
+    _long = long;
+
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(double.parse(_lat), double.parse(_long));
+
+    if (placemarks.isNotEmpty) {
+      Placemark locationInfo = placemarks[0];
+
+      mainWidgetData.locationName = locationInfo.locality != ""
+          ? '${locationInfo.locality ?? ""}, ${locationInfo.country ?? ""}'
+          : locationInfo.country ?? "";
+      notifyListeners();
+      print("Coordinates: $_lat,$_long");
+      await _fetchCurrentWeather();
+      await _fetchHourlyTemp();
+      await _fetchDailyTemp();
+      locationId = null;
+      isLoading = false;
     }
   }
 }

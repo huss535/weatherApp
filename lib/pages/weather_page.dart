@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weather_app/providers/weather_data_provider.dart';
-import 'package:weather_app/utilities/bottom_nav.dart';
 import 'package:weather_app/utilities/daily_temp.dart';
 import 'package:weather_app/utilities/hourly_temp.dart';
 import 'package:weather_app/utilities/main_widgets.dart';

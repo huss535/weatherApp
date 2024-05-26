@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:weather_app/pages/weather_page.dart';
+import 'package:weather_app/providers/navigation_provider.dart';
 import 'package:weather_app/providers/weather_data_provider.dart';
-import 'package:weather_app/utilities/bottom_nav.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Page for users to lookup weather based on location
@@ -73,7 +73,7 @@ class _LocationPageState extends State<LocationPage> {
     Provider.of<WeatherDataProvider>(context, listen: false)
         .updateLocationId(id);
 
-    Navigator.pushNamed(context, "/");
+    Provider.of<NavigationProvider>(context, listen: false).setIndex(0);
   }
 
   Widget build(BuildContext context) {

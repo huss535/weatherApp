@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:weather_app/pages/weather_page.dart';
+import 'package:weather_app/providers/navigation_provider.dart';
 import 'package:weather_app/providers/weather_data_provider.dart';
+import 'package:http/http.dart' as http;
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -20,10 +24,12 @@ class _MapPageState extends State<MapPage> {
   Future<void> setLocationName() async {
     List<Placemark> placemarks;
     try {
+      print(lat);
       placemarks = await placemarkFromCoordinates(lat, long);
       if (placemarks.isNotEmpty) {
         Placemark locationInfo = placemarks[0];
         setState(() {
+          // sets location name to be displayed on long press
           locationName = locationInfo.locality != ""
               ? '${locationInfo.locality ?? ""}, ${locationInfo.country ?? ""}'
               : locationInfo.country ?? "";
@@ -40,16 +46,40 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  void _handleLongPress(LatLng coord) {
-    setState(() {
-      lat = coord.latitude;
-      long = coord.longitude;
-    });
+  void setLocationId(WeatherDataProvider weatherProvider,
+      NavigationProvider navigationProvider) async {
+    /*  final queryParams = {
+      "latlng": "$lat,$long",
+      "key": dotenv.env["MAPS_API_KEY"]
+    }; */
 
-    showDialog(context: context, builder: ((context) => _showDialog()));
+    // get map location id to fetch weather info from provider
+    /*  Uri locationIdCall =
+        Uri.parse("https://maps.googleapis.com/maps/api/geocode/json")
+            .replace(queryParameters: queryParams);
+    http.Response response = await http.get(locationIdCall); */
+
+    /*  if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+      if (data.containsKey("results") && data["results"].isNotEmpty) {
+        String locationId = data["results"][0]["place_id"]; */
+
+    print("Map page $lat $long");
+    weatherProvider.updateLocationIdWithCoordinates(
+        lat.toString(), long.toString());
+    //Navigator.pop(context);
+
+    navigationProvider.setIndex(0);
+    /*  } else {
+        throw Exception("Invalid or empty response data");
+      }
+    } else {
+      throw Exception("Failed to fetch location data: ${response.statusCode}");
+    } */
   }
 
-  Widget _showDialog() {
+  Widget _showDialog(WeatherDataProvider weatherProvider,
+      NavigationProvider navigationProvider) {
     return FutureBuilder(
       future: setLocationName(),
       builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
@@ -75,13 +105,7 @@ class _MapPageState extends State<MapPage> {
                           style: TextStyle(fontSize: 20, fontFamily: "Lato")),
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => WeatherPage(),
-                            ),
-                          );
+                          setLocationId(weatherProvider, navigationProvider);
                         },
                         child: const Text(
                           "Go to weather",
@@ -108,15 +132,30 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     WeatherDataProvider weatherProvider =
         Provider.of<WeatherDataProvider>(context);
+    NavigationProvider navigationProvider =
+        Provider.of<NavigationProvider>(context);
+
+    void handleLongPress(LatLng coord) {
+      setState(() {
+        lat = coord.latitude;
+        long = coord.longitude;
+      });
+
+      showDialog(
+          context: context,
+          builder: ((context) =>
+              _showDialog(weatherProvider, navigationProvider)));
+    }
+
     List<String> coordinates = weatherProvider.getCoordinates();
-    lat = double.parse(coordinates[0]).truncateToDouble();
-    long = double.parse(coordinates[1]).truncateToDouble();
-    LatLng center = LatLng(lat, long);
+    double latView = double.parse(coordinates[0]).truncateToDouble();
+    double longVIew = double.parse(coordinates[1]).truncateToDouble();
+    LatLng center = LatLng(latView, longVIew);
     return Scaffold(
       body: GoogleMap(
         onMapCreated: _onMapCreated,
         initialCameraPosition: CameraPosition(target: center, zoom: 11.0),
-        onLongPress: _handleLongPress,
+        onLongPress: handleLongPress,
       ),
     );
   }
