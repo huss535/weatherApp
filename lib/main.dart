@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:weather_app/pages/location_page.dart';
@@ -19,9 +20,17 @@ Future main() async {
 
 class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
+  void _provideApiKeyToIos() {
+    const platform = MethodChannel('com.example.app/google_maps');
+    final apiKey = dotenv.env['MAPS_API_KEY'];
+
+    platform.invokeMethod('provideApiKey', {'apiKey': apiKey});
+  }
 
   @override
   Widget build(BuildContext context) {
+    _provideApiKeyToIos();
+
     return ChangeNotifierProvider(
       create: (context) => WeatherDataProvider(),
       child: MaterialApp(
