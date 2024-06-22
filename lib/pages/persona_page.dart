@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 
 class PersonaPage extends StatefulWidget {
@@ -11,6 +13,7 @@ class _PersonaPageState extends State<PersonaPage> {
   double _value = 20;
   String _persona = "";
   bool _isProfanity = false;
+  int value = -1;
   Map<double, String> personaMap = {
     0.0: "Professional",
     20.00: "Funny",
@@ -20,6 +23,28 @@ class _PersonaPageState extends State<PersonaPage> {
     100.0: "Mad Max"
   };
 
+  Widget CustomRadioButton(String text, int index) {
+    return OutlinedButton(
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.resolveWith<Color?>(
+            (Set<WidgetState> states) {
+              if (value == index) {
+                return Colors.red;
+              } else {
+                return Colors.blue;
+              }
+            },
+          ),
+        ),
+        onPressed: () {
+          setState(() {
+            value = index;
+          });
+        },
+        child: Text(text));
+  }
+
+// dialog for choosing political idealogies
   Future<void> _dialogBuilder(BuildContext context) {
     return showDialog<void>(
       context: context,
@@ -32,6 +57,16 @@ class _PersonaPageState extends State<PersonaPage> {
               border: Border.all(width: 2),
               borderRadius: BorderRadius.circular(15.0),
               color: const Color.fromRGBO(140, 190, 233, 1),
+            ),
+            child: Column(
+              children: [
+                CustomRadioButton("Apolitical", 1),
+                CustomRadioButton("Libertarian", 2),
+                CustomRadioButton("Conservative", 3),
+                CustomRadioButton("Liberal", 4),
+                CustomRadioButton("Communist", 5),
+                CustomRadioButton("Anarchist", 6),
+              ],
             ),
           ),
         );
