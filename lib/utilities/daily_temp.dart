@@ -41,7 +41,7 @@ class DailyTemp extends StatelessWidget {
                 width: 100,
                 child: Text(
                   day,
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
             ),

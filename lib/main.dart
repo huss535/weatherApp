@@ -6,6 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:weather_app/pages/location_page.dart';
 import 'package:weather_app/pages/map_page.dart';
+import 'package:weather_app/pages/settings_page.dart';
 import 'package:weather_app/pages/weather_page.dart';
 import 'package:weather_app/providers/navigation_provider.dart';
 import 'package:weather_app/providers/weather_data_provider.dart';
@@ -40,7 +41,7 @@ class MyApp extends StatelessWidget {
         title: 'Weather Wizard',
         theme: ThemeData(
             // Your theme configurations
-            ),
+            fontFamily: "Lato"),
         debugShowCheckedModeBanner: false,
         initialRoute: '/',
         routes: {
@@ -73,6 +74,7 @@ class _HomePageState extends State<HomePage> {
           WeatherPage(),
           LocationPage(),
           MapPage(),
+          SettingsPage()
           // Add your SettingsPage here if you have one
         ],
       ),

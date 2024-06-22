@@ -21,6 +21,7 @@ dependencies:
   uuid: ^4.4.0
   weather_icons: ^3.0.0
   google_maps_flutter: ^2.6.1
+  google_generative_ai: ^0.4.3
 
 dev_dependencies:
   flutter_test:

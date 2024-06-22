@@ -78,12 +78,14 @@ class WeatherDataProvider extends ChangeNotifier {
 
       final List<dynamic> hourlyData = jsonData['list'];
       tempList.clear();
+      print(hourlyData.length);
       for (int i = 0; i < 24; i++) {
         HourlyTempData entry = HourlyTempData(
           temp: hourlyData[i]["main"]["temp"].round().toString(),
           hour: formatTimestamp(hourlyData[i]["dt"]),
           iconCode: hourlyData[i]["weather"][0]["icon"].toString(),
         );
+
         tempList.add(entry);
       }
       notifyListeners();

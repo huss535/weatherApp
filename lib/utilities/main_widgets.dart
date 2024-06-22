@@ -109,7 +109,10 @@ class WeatherData extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Text("Today"),
+              Text(
+                "Today",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
               Text(weatherInfo),
             ],
           ),
@@ -131,7 +134,8 @@ class WeatherData extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Text("Wind Speed"),
+              Text("Wind Speed",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               Text('${windSpeed} m/s'),
             ],
           ),

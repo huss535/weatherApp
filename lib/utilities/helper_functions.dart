@@ -53,9 +53,7 @@ String formatTimestamp(int timestamp) {
 
   // Format time
   // Example format: "9:00"
-  return displayedHour.hour.toString().padLeft(2, "0") +
-      ":" +
-      displayedHour.minute.toString().padLeft(2, "0");
+  return "${displayedHour.hour.toString().padLeft(2, "0")}:${displayedHour.minute.toString().padLeft(2, "0")}";
 }
 
 Future<Position> getLocation() async {
