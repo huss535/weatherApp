@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class PersonaPage extends StatefulWidget {
   double persona;
-  String politics;
+  double politics;
   bool profanity;
   PersonaPage(this.persona, this.politics, this.profanity);
 
@@ -13,9 +13,14 @@ class PersonaPage extends StatefulWidget {
 }
 
 class _PersonaPageState extends State<PersonaPage> {
-  //Three variables used with the slider component
-  String _persona = "";
-  double _value = 0.0;
+  //Two variables used with the slider component
+  late String _persona;
+  late double _personaValue;
+
+  late String _politics;
+  late double _politicsValue;
+
+  // Map for different personalities used in slider
   Map<double, String> personaMap = {
     0.0: "Professional",
     20.00: "Funny",
@@ -25,67 +30,38 @@ class _PersonaPageState extends State<PersonaPage> {
     100.0: "Mad Max"
   };
 
+  // Map for different political ideologies used in slider
+  Map<double, String> politicsMap = {
+    0.0: "Apolitical",
+    20.00: "Libertarian",
+    40.00: "Conservative",
+    60.00: "Liberal",
+    80.00: "Communist",
+    100.0: "Anarchist"
+  };
+
 // Variable used with the switch
-  bool _isProfanity = false;
+  late bool _isProfanity;
   int value = -1;
 
-  @override
+  // retrieve all user preferences for the AI assistant
   @override
   void initState() {
     super.initState();
-    _value = widget.persona;
-    _persona = personaMap[_value] ?? "";
+    _personaValue = widget.persona;
+    _persona = personaMap[_personaValue] ?? "";
+    _isProfanity = widget.profanity;
+    _politicsValue = widget.politics;
+    _politics = politicsMap[_politicsValue] ?? "";
   }
 
-  Widget CustomRadioButton(String text, int index) {
-    return OutlinedButton(
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.resolveWith<Color?>(
-            (Set<WidgetState> states) {
-              if (value == index) {
-                return Colors.red;
-              } else {
-                return Colors.blue;
-              }
-            },
-          ),
-        ),
-        onPressed: () {
-          setState(() {
-            value = index;
-          });
-        },
-        child: Text(text));
-  }
-
-// dialog for choosing political idealogies
-  Future<void> _dialogBuilder(BuildContext context) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          child: Container(
-            padding: EdgeInsets.all(16.0),
-            height: 400,
-            decoration: BoxDecoration(
-              border: Border.all(width: 2),
-              borderRadius: BorderRadius.circular(15.0),
-              color: const Color.fromRGBO(140, 190, 233, 1),
-            ),
-            child: Column(
-              children: [
-                CustomRadioButton("Apolitical", 1),
-                CustomRadioButton("Libertarian", 2),
-                CustomRadioButton("Conservative", 3),
-                CustomRadioButton("Liberal", 4),
-                CustomRadioButton("Communist", 5),
-                CustomRadioButton("Anarchist", 6),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+  Future<void> _setPreference(String persona, String updateParameter) async {
+    if (updateParameter == "persona") {
+    } else if (updateParameter == "profanity") {
+    } else if (updateParameter == "politics") {
+    } else {
+      throw Exception("The setting you want to update does not exist");
+    }
   }
 
   @override
@@ -101,28 +77,14 @@ class _PersonaPageState extends State<PersonaPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Container(
-              child: Column(
-                children: [
-                  //slider to pick AI persona
-                  Slider(
-                      min: 0.0,
-                      max: 100.0,
-                      divisions: 5,
-                      value: _value,
-                      onChanged: (value) {
-                        setState(() {
-                          _value = value;
-                          _persona = personaMap[value] ?? "";
-                        });
-                      }),
-
-                  Text(
-                    "$_persona",
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                ],
+            Text(
+              "Personality",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
               ),
+            ),
+            Container(
               height: 90,
               decoration: BoxDecoration(
                 border: Border.all(width: 2),
@@ -134,6 +96,75 @@ class _PersonaPageState extends State<PersonaPage> {
                 ],
                 borderRadius: BorderRadius.circular(15.0),
                 color: const Color.fromRGBO(140, 190, 233, 1),
+              ),
+              child: Column(
+                children: [
+                  //slider to pick AI persona
+                  Slider(
+                      min: 0.0,
+                      max: 100.0,
+                      divisions: 5,
+                      value: _personaValue,
+                      onChanged: (value) {
+                        setState(() {
+                          _personaValue = value;
+                          _persona = personaMap[value] ?? "";
+                        });
+                      }),
+
+                  Text(
+                    "$_persona",
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 100,
+            ),
+
+            Text(
+              "Politics",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+
+            //Slider for political ideologies
+            Container(
+              height: 90,
+              decoration: BoxDecoration(
+                border: Border.all(width: 2),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color.fromRGBO(126, 74, 221, 1),
+                    offset: Offset(0, 8),
+                  ),
+                ],
+                borderRadius: BorderRadius.circular(15.0),
+                color: const Color.fromRGBO(140, 190, 233, 1),
+              ),
+              child: Column(
+                children: [
+                  //slider to pick AI persona
+                  Slider(
+                      min: 0.0,
+                      max: 100.0,
+                      divisions: 5,
+                      value: _politicsValue,
+                      onChanged: (value) {
+                        setState(() {
+                          _politicsValue = value;
+                          _politics = politicsMap[value] ?? "";
+                        });
+                      }),
+
+                  Text(
+                    "$_politics",
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                ],
               ),
             ),
             SizedBox(
@@ -171,44 +202,6 @@ class _PersonaPageState extends State<PersonaPage> {
             ),
             SizedBox(
               height: 100,
-            ),
-            InkWell(
-              onTap: () => {_dialogBuilder(context)},
-              splashColor: Colors.blueAccent,
-              highlightColor: Color.fromRGBO(126, 74, 221, 1),
-              borderRadius: BorderRadius.circular(15),
-              child: Ink(
-                decoration: BoxDecoration(
-                  border: Border.all(width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color.fromRGBO(126, 74, 221, 1),
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                  borderRadius: BorderRadius.circular(15.0),
-                  color: const Color.fromRGBO(140, 190, 233, 1),
-                ),
-                child: Container(
-                  height: 80,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 10, right: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("Politics", style: TextStyle(fontSize: 18)),
-                        Row(
-                          children: [
-                            Text('Communist', style: TextStyle(fontSize: 18)),
-                            SizedBox(width: 10),
-                            Icon(Icons.arrow_forward_ios)
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
             ),
           ],
         ),

@@ -11,14 +11,14 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   double persona = 0.0;
-  String politics = "Apolitical";
+  double politics = 0.0;
   bool profanity = false;
 
   Future<void> intializePreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       persona = prefs.getDouble("persona") ?? 0.0;
-      politics = prefs.getString("politics") ?? "Apolitical";
+      politics = prefs.getDouble("politics") ?? 0.0;
       profanity = prefs.getBool("profanity") ?? false;
     });
   }
