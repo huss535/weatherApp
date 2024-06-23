@@ -4,14 +4,13 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import 'package:weather_app/pages/weather_page.dart';
 import 'package:weather_app/providers/navigation_provider.dart';
 import 'package:weather_app/providers/weather_data_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Page for users to lookup weather based on location
 class LocationPage extends StatefulWidget {
-  LocationPage({super.key});
+  const LocationPage({super.key});
 
   @override
   State<LocationPage> createState() => _LocationPageState();
@@ -37,14 +36,14 @@ class _LocationPageState extends State<LocationPage> {
 
 // retrieve location suggestions from the google google places api
   void getSuggestion(String input) async {
-    String? kPLACES_API_KEY = dotenv.env["MAPS_API_KEY"];
+    String? kplacesApiKey = dotenv.env["MAPS_API_KEY"];
     String type = '(regions)';
     String baseURL =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json';
 
     final queryParams = {
       'input': input,
-      'key': kPLACES_API_KEY,
+      'key': kplacesApiKey,
       'sessiontoken': _sessionToken,
     };
 
@@ -76,6 +75,7 @@ class _LocationPageState extends State<LocationPage> {
     Provider.of<NavigationProvider>(context, listen: false).setIndex(0);
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

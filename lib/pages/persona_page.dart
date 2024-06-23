@@ -1,26 +1,26 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PersonaPage extends StatefulWidget {
   double persona;
   double politics;
   bool profanity;
-  PersonaPage(this.persona, this.politics, this.profanity);
+  PersonaPage(this.persona, this.politics, this.profanity, {super.key});
 
   @override
   State<PersonaPage> createState() => _PersonaPageState();
 }
 
 class _PersonaPageState extends State<PersonaPage> {
-  //Two variables used with the slider component
   late String _persona;
-  late double _personaValue;
-
+  double _personaValue = 0.0;
   late String _politics;
   late double _politicsValue;
 
-  // Map for different personalities used in slider
+  late bool _isProfanity;
+
   Map<double, String> personaMap = {
     0.0: "Professional",
     20.00: "Funny",
@@ -30,7 +30,6 @@ class _PersonaPageState extends State<PersonaPage> {
     100.0: "Mad Max"
   };
 
-  // Map for different political ideologies used in slider
   Map<double, String> politicsMap = {
     0.0: "Apolitical",
     20.00: "Libertarian",
@@ -40,32 +39,56 @@ class _PersonaPageState extends State<PersonaPage> {
     100.0: "Anarchist"
   };
 
-// Variable used with the switch
-  late bool _isProfanity;
-  int value = -1;
-
-  // retrieve all user preferences for the AI assistant
   @override
   void initState() {
     super.initState();
     _personaValue = widget.persona;
-    _persona = personaMap[_personaValue] ?? "";
-    _isProfanity = widget.profanity;
-    _politicsValue = widget.politics;
-    _politics = politicsMap[_politicsValue] ?? "";
+
+    _getPreference();
   }
 
-  Future<void> _setPreference(String persona, String updateParameter) async {
-    if (updateParameter == "persona") {
-    } else if (updateParameter == "profanity") {
-    } else if (updateParameter == "politics") {
-    } else {
-      throw Exception("The setting you want to update does not exist");
-    }
+  @override
+  void dispose() {
+    _setPreference();
+    super.dispose();
+  }
+
+  Future<void> _getPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      _personaValue = prefs.getDouble("persona") ?? widget.persona;
+      _isProfanity = prefs.getBool("profanity") ?? widget.profanity;
+      _politicsValue = prefs.getDouble("politics") ?? widget.politics;
+      _persona = personaMap[_personaValue] ?? "";
+      _politics = politicsMap[_politicsValue] ?? "";
+    });
+  }
+
+  Future<void> _setPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setDouble("persona", _personaValue);
+    await prefs.setBool("profanity", _isProfanity);
+    await prefs.setDouble("politics", _politicsValue);
   }
 
   @override
   Widget build(BuildContext context) {
+    // Check if _personaValue is null, and show a loading indicator if needed
+    if (_personaValue == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Persona"),
+          backgroundColor: Colors.deepPurple,
+          elevation: 30.0,
+        ),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Persona"),
@@ -77,11 +100,14 @@ class _PersonaPageState extends State<PersonaPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(
-              "Personality",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Personality",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
               ),
             ),
             Container(
@@ -99,7 +125,6 @@ class _PersonaPageState extends State<PersonaPage> {
               ),
               child: Column(
                 children: [
-                  //slider to pick AI persona
                   Slider(
                       min: 0.0,
                       max: 100.0,
@@ -109,11 +134,11 @@ class _PersonaPageState extends State<PersonaPage> {
                         setState(() {
                           _personaValue = value;
                           _persona = personaMap[value] ?? "";
+                          _setPreference();
                         });
                       }),
-
                   Text(
-                    "$_persona",
+                    _persona,
                     style: const TextStyle(fontSize: 20),
                   ),
                 ],
@@ -122,16 +147,16 @@ class _PersonaPageState extends State<PersonaPage> {
             SizedBox(
               height: 100,
             ),
-
-            Text(
-              "Politics",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Politics",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
               ),
             ),
-
-            //Slider for political ideologies
             Container(
               height: 90,
               decoration: BoxDecoration(
@@ -147,7 +172,6 @@ class _PersonaPageState extends State<PersonaPage> {
               ),
               child: Column(
                 children: [
-                  //slider to pick AI persona
                   Slider(
                       min: 0.0,
                       max: 100.0,
@@ -157,14 +181,24 @@ class _PersonaPageState extends State<PersonaPage> {
                         setState(() {
                           _politicsValue = value;
                           _politics = politicsMap[value] ?? "";
+                          _setPreference();
                         });
                       }),
-
                   Text(
-                    "$_politics",
+                    _politics,
                     style: const TextStyle(fontSize: 20),
                   ),
                 ],
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Choose Apolitical if you want to disable this option",
+                style: TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
             SizedBox(
@@ -172,6 +206,17 @@ class _PersonaPageState extends State<PersonaPage> {
             ),
             Container(
               height: 90,
+              decoration: BoxDecoration(
+                border: Border.all(width: 2),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color.fromRGBO(126, 74, 221, 1),
+                    offset: Offset(0, 8),
+                  ),
+                ],
+                borderRadius: BorderRadius.circular(15.0),
+                color: const Color.fromRGBO(140, 190, 233, 1),
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -184,20 +229,10 @@ class _PersonaPageState extends State<PersonaPage> {
                       onChanged: (value) {
                         setState(() {
                           _isProfanity = value;
+                          _setPreference();
                         });
                       })
                 ],
-              ),
-              decoration: BoxDecoration(
-                border: Border.all(width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color.fromRGBO(126, 74, 221, 1),
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-                borderRadius: BorderRadius.circular(15.0),
-                color: const Color.fromRGBO(140, 190, 233, 1),
               ),
             ),
             SizedBox(

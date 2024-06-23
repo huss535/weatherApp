@@ -1,12 +1,7 @@
 // ignore_for_file: prefer_const_constructors, sort_child_properties_last
 
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-import 'package:weather_app/providers/weather_data_provider.dart';
 import 'package:weather_icons/weather_icons.dart';
 
 import 'helper_functions.dart';
@@ -22,8 +17,8 @@ class DailyTemp extends StatelessWidget {
     required this.max,
     required this.day,
     this.iconCode = "",
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +53,7 @@ class DailyTemp extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.black, width: 2),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Color.fromRGBO(126, 74, 221, 1),
               offset: Offset(0, 8),
@@ -75,7 +70,7 @@ class DailyTemp extends StatelessWidget {
 // Generates the daily weather widgets dynamically
 class DailyTempAll extends StatefulWidget {
   final List<DailyTempData> dailyTempList;
-  DailyTempAll({required this.dailyTempList, Key? key}) : super(key: key);
+  const DailyTempAll({required this.dailyTempList, super.key});
 
   @override
   State<DailyTempAll> createState() => _DailyTempAllState();

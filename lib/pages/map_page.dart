@@ -1,16 +1,13 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:weather_app/providers/navigation_provider.dart';
 import 'package:weather_app/providers/weather_data_provider.dart';
-import 'package:http/http.dart' as http;
 
 class MapPage extends StatefulWidget {
-  const MapPage({Key? key}) : super(key: key);
+  const MapPage({super.key});
 
   @override
   State<MapPage> createState() => _MapPageState();
@@ -102,16 +99,16 @@ class _MapPageState extends State<MapPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Text(locationName,
-                          style: TextStyle(fontSize: 20, fontFamily: "Lato")),
+                          style: const TextStyle(fontSize: 20, fontFamily: "Lato")),
                       ElevatedButton(
                         onPressed: () {
                           setLocationId(weatherProvider, navigationProvider);
                         },
+                        style: const ButtonStyle(
+                          elevation: WidgetStatePropertyAll(5),
+                        ),
                         child: const Text(
                           "Go to weather",
-                        ),
-                        style: ButtonStyle(
-                          elevation: WidgetStatePropertyAll(5),
                         ),
                       ),
                     ],

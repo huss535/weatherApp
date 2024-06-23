@@ -1,12 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-import 'package:weather_app/providers/weather_data_provider.dart';
 import 'package:weather_app/utilities/helper_functions.dart';
 import 'package:weather_icons/weather_icons.dart';
 
@@ -14,7 +9,7 @@ import 'package:weather_icons/weather_icons.dart';
 
 class MainWidgets extends StatefulWidget {
   final MainWidgetData mainWidgetData;
-  MainWidgets({required this.mainWidgetData, super.key});
+  const MainWidgets({required this.mainWidgetData, super.key});
 
   @override
   State<MainWidgets> createState() => _MainWidgetsState();
@@ -29,7 +24,7 @@ class _MainWidgetsState extends State<MainWidgets> {
   @override
   Widget build(BuildContext context) {
     // Build UI with fetched data
-    return Container(
+    return SizedBox(
       height: 300,
       child: Column(
         children: [
@@ -55,8 +50,7 @@ class _MainWidgetsState extends State<MainWidgets> {
 class MainWeatherWidget extends StatelessWidget {
   final String temp;
   final String iconCode;
-  const MainWeatherWidget({required this.temp, this.iconCode = "", Key? key})
-      : super(key: key);
+  const MainWeatherWidget({required this.temp, this.iconCode = "", super.key});
   @override
   Widget build(BuildContext context) {
     IconData icon = getWeatherIcon(iconCode);
@@ -77,7 +71,7 @@ class MainWeatherWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Text(
-            "${temp}°C",
+            "$temp°C",
             style: TextStyle(fontSize: 46),
           ),
           BoxedIcon(
@@ -95,8 +89,7 @@ class WeatherData extends StatelessWidget {
   final String weatherInfo;
   final String windSpeed;
   const WeatherData(
-      {required this.weatherInfo, required this.windSpeed, Key? key})
-      : super(key: key);
+      {required this.weatherInfo, required this.windSpeed, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -106,6 +99,17 @@ class WeatherData extends StatelessWidget {
         Container(
           height: 90,
           width: 200,
+          decoration: BoxDecoration(
+            border: Border.all(width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: const Color.fromRGBO(126, 74, 221, 1),
+                offset: const Offset(0, 8),
+              ),
+            ],
+            borderRadius: BorderRadius.circular(15.0),
+            color: const Color.fromRGBO(140, 190, 233, 1),
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -116,6 +120,10 @@ class WeatherData extends StatelessWidget {
               Text(weatherInfo),
             ],
           ),
+        ),
+        Container(
+          height: 90,
+          width: 150,
           decoration: BoxDecoration(
             border: Border.all(width: 2),
             boxShadow: [
@@ -127,28 +135,13 @@ class WeatherData extends StatelessWidget {
             borderRadius: BorderRadius.circular(15.0),
             color: const Color.fromRGBO(140, 190, 233, 1),
           ),
-        ),
-        Container(
-          height: 90,
-          width: 150,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Text("Wind Speed",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              Text('${windSpeed} m/s'),
+              Text('$windSpeed m/s'),
             ],
-          ),
-          decoration: BoxDecoration(
-            border: Border.all(width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: const Color.fromRGBO(126, 74, 221, 1),
-                offset: const Offset(0, 8),
-              ),
-            ],
-            borderRadius: BorderRadius.circular(15.0),
-            color: const Color.fromRGBO(140, 190, 233, 1),
           ),
         ),
       ],

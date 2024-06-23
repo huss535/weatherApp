@@ -14,6 +14,12 @@ class _SettingsPageState extends State<SettingsPage> {
   double politics = 0.0;
   bool profanity = false;
 
+  @override
+  void initState() {
+    super.initState();
+    intializePreferences();
+  }
+
   Future<void> intializePreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -27,7 +33,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Settings",
           style: TextStyle(color: Colors.white),
         ),
@@ -35,7 +41,7 @@ class _SettingsPageState extends State<SettingsPage> {
         elevation: 30.0,
       ),
       body: Padding(
-        padding: EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(15.0),
         child: InkWell(
           onTap: () {
             Navigator.push(
@@ -46,24 +52,24 @@ class _SettingsPageState extends State<SettingsPage> {
             );
           },
           splashColor: Colors.blueAccent,
-          highlightColor: Color.fromRGBO(126, 74, 221, 1),
+          highlightColor: const Color.fromRGBO(126, 74, 221, 1),
           borderRadius: BorderRadius.circular(15),
           child: Ink(
             decoration: BoxDecoration(
               border: Border.all(width: 2),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
-                  color: const Color.fromRGBO(126, 74, 221, 1),
-                  offset: const Offset(0, 8),
+                  color: Color.fromRGBO(126, 74, 221, 1),
+                  offset: Offset(0, 8),
                 ),
               ],
               borderRadius: BorderRadius.circular(15.0),
               color: const Color.fromRGBO(140, 190, 233, 1),
             ),
-            child: Container(
+            child: const SizedBox(
               height: 80,
               child: Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10),
+                padding: EdgeInsets.only(left: 10, right: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

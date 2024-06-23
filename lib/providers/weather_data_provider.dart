@@ -54,7 +54,7 @@ class WeatherDataProvider extends ChangeNotifier {
     } catch (e) {
       print("Error fetching weather data: $e");
       // Rethrow the exception to let the caller handle it.
-      throw e;
+      rethrow;
     }
   }
 
