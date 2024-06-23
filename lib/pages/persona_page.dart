@@ -3,17 +3,19 @@
 import 'package:flutter/material.dart';
 
 class PersonaPage extends StatefulWidget {
-  const PersonaPage({super.key});
+  double persona;
+  String politics;
+  bool profanity;
+  PersonaPage(this.persona, this.politics, this.profanity);
 
   @override
   State<PersonaPage> createState() => _PersonaPageState();
 }
 
 class _PersonaPageState extends State<PersonaPage> {
-  double _value = 20;
+  //Three variables used with the slider component
   String _persona = "";
-  bool _isProfanity = false;
-  int value = -1;
+  double _value = 0.0;
   Map<double, String> personaMap = {
     0.0: "Professional",
     20.00: "Funny",
@@ -22,6 +24,18 @@ class _PersonaPageState extends State<PersonaPage> {
     80.00: "Borat",
     100.0: "Mad Max"
   };
+
+// Variable used with the switch
+  bool _isProfanity = false;
+  int value = -1;
+
+  @override
+  @override
+  void initState() {
+    super.initState();
+    _value = widget.persona;
+    _persona = personaMap[_value] ?? "";
+  }
 
   Widget CustomRadioButton(String text, int index) {
     return OutlinedButton(

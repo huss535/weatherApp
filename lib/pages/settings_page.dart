@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_app/pages/persona_page.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -9,6 +10,19 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  double persona = 0.0;
+  String politics = "Apolitical";
+  bool profanity = false;
+
+  Future<void> intializePreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      persona = prefs.getDouble("persona") ?? 0.0;
+      politics = prefs.getString("politics") ?? "Apolitical";
+      profanity = prefs.getBool("profanity") ?? false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +40,9 @@ class _SettingsPageState extends State<SettingsPage> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => PersonaPage()),
+              MaterialPageRoute(
+                  builder: (context) =>
+                      PersonaPage(persona, politics, profanity)),
             );
           },
           splashColor: Colors.blueAccent,
