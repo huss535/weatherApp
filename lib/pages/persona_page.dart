@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../utilities/maps.dart';
 
 class PersonaPage extends StatefulWidget {
   double persona;
@@ -20,24 +21,6 @@ class _PersonaPageState extends State<PersonaPage> {
   late double _politicsValue;
 
   late bool _isProfanity;
-
-  Map<double, String> personaMap = {
-    0.0: "Professional",
-    20.00: "Funny",
-    40.00: "Snarky",
-    60.00: "Mean girl",
-    80.00: "Borat",
-    100.0: "Mad Max"
-  };
-
-  Map<double, String> politicsMap = {
-    0.0: "Apolitical",
-    20.00: "Libertarian",
-    40.00: "Conservative",
-    60.00: "Liberal",
-    80.00: "Communist",
-    100.0: "Anarchist"
-  };
 
   @override
   void initState() {
@@ -79,6 +62,12 @@ class _PersonaPageState extends State<PersonaPage> {
     if (_personaValue == null) {
       return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context, _persona);
+            },
+          ),
           title: Text("Persona"),
           backgroundColor: Colors.deepPurple,
           elevation: 30.0,
@@ -91,7 +80,10 @@ class _PersonaPageState extends State<PersonaPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Persona"),
+        title: Text(
+          "Persona",
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.deepPurple,
         elevation: 30.0,
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_app/pages/persona_page.dart';
+import '../utilities/maps.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -10,6 +11,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  String personaDisplayed = "";
   double persona = 0.0;
   double politics = 0.0;
   bool profanity = false;
@@ -43,13 +45,14 @@ class _SettingsPageState extends State<SettingsPage> {
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: InkWell(
-          onTap: () {
-            Navigator.push(
+          onTap: () async {
+            await Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) =>
                       PersonaPage(persona, politics, profanity)),
             );
+            intializePreferences();
           },
           splashColor: Colors.blueAccent,
           highlightColor: const Color.fromRGBO(126, 74, 221, 1),
@@ -66,7 +69,7 @@ class _SettingsPageState extends State<SettingsPage> {
               borderRadius: BorderRadius.circular(15.0),
               color: const Color.fromRGBO(140, 190, 233, 1),
             ),
-            child: const SizedBox(
+            child: SizedBox(
               height: 80,
               child: Padding(
                 padding: EdgeInsets.only(left: 10, right: 10),
@@ -76,7 +79,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     Text("Persona", style: TextStyle(fontSize: 18)),
                     Row(
                       children: [
-                        Text('American Psycho', style: TextStyle(fontSize: 18)),
+                        Text(personaMap[persona] ?? "Nothing",
+                            style: TextStyle(fontSize: 18)),
                         SizedBox(width: 10),
                         Icon(Icons.arrow_forward_ios)
                       ],
