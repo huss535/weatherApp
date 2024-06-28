@@ -11,7 +11,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  String personaDisplayed = "";
   double persona = 0.0;
   double politics = 0.0;
   bool profanity = false;
