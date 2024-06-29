@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_app/providers/weather_data_provider.dart';
 import 'package:weather_app/utilities/daily_temp.dart';
+import 'package:weather_app/utilities/helper_functions.dart';
 import 'package:weather_app/utilities/hourly_temp.dart';
 import 'package:weather_app/utilities/main_widgets.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
@@ -24,21 +25,18 @@ class WeatherPage extends StatefulWidget {
 class _WeatherPageState extends State<WeatherPage> {
   String aIPropmpt = "No Comment";
 
-  Future<void> testGemini() async {
+  Future<void> testGemini(MainWidgetData mainWidgetData) async {
     TextPart prompt;
     final prefs = await SharedPreferences.getInstance();
-
     final String persona = personaMap[prefs.getDouble("persona")]!;
     final String politics = personaMap[prefs.getDouble("politics")]!;
-    final String profanity =
-        prefs.getBool("profanity")! ? "use profanity" : "not use profanity";
-    if (persona == "Professional" && politics == "Apolitical") {
-      prompt = TextPart(
-          "Please create a prompt for a user in a mobile weather app, keeping it concise with a maximum of three sentences. It should be professional, warm and welcoming. For example, Hello'");
-    }
-    prompt = TextPart(
-        " Please create a prompt for a user in a mobile weather app, keeping it concise with a maximum of three sentences. You should embody the character of ${persona} with ${politics} leanings and the option to  ${profanity}. For example, if I were to embody a character like a futuristic rebel with anarchist ideals and allowed to use profanity, I'd expect something like 'Hey folks, brace yourselves! The weather's about to get bloody wild, but we'll ride it out together, kicking some serious meteorological ass!'");
+    final String weather = mainWidgetData.weatherInfo;
+    final String temp = mainWidgetData.temp;
+    final String location = mainWidgetData.locationName;
 
+    prompt = TextPart(
+        "Generate a fun message for a user of a weather app keeping it within 2 sentences, Step into the persona of ${persona} with a ${politics} stance to give this message. Use the information as well, the user is currently in ${location}, where the temperature is ${temp}°C, and the weather condition is ${weather}. Provide a concise update that reflects their character and approach and make it a fun, engaging experience for the user.");
+    print(weather);
     print(prompt.text);
     final response = await model.generateContent([
       Content.multi([prompt])
@@ -48,17 +46,21 @@ class _WeatherPageState extends State<WeatherPage> {
     });
   }
 
-  /*  @override
+  @override
   void initState() {
     super.initState();
-    testGemini(); // Call function to initialize Gemini data asynchronously
-  } */
+    final weatherProvider =
+        Provider.of<WeatherDataProvider>(context, listen: false);
 
-  @override
+    testGemini(weatherProvider
+        .mainWidgetData); // Call function to initialize Gemini data asynchronously
+  }
+
+  /* @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     testGemini(); // Call _initializeGemini whenever dependencies change (e.g., navigating to this page)
-  }
+  } */
 
   @override
   Widget build(BuildContext context) {
@@ -81,29 +83,37 @@ class _WeatherPageState extends State<WeatherPage> {
           backgroundColor: Colors.deepPurple,
           elevation: 30.0,
         ),
-        body: Consumer<WeatherDataProvider>(
-          builder: (context, weatherProvider, _) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Center(
-                child: SizedBox(
-                  width: 380,
-                  child: ListView(
-                    children: [
-                      Text(aIPropmpt),
-                      MainWidgets(
-                          mainWidgetData: weatherProvider.mainWidgetData),
-                      const SizedBox(height: 40),
-                      HourlyTempAll(tempList: weatherProvider.tempList),
-                      const SizedBox(height: 40),
-                      DailyTempAll(
-                          dailyTempList: weatherProvider.dailyTempList),
-                    ],
+        body: RefreshIndicator(
+          onRefresh: () => testGemini(weatherProvider.mainWidgetData),
+          child: Consumer<WeatherDataProvider>(
+            builder: (context, weatherProvider, _) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Center(
+                  child: SizedBox(
+                    width: 380,
+                    child: ListView(
+                      children: [
+                        Text(
+                          textAlign: TextAlign.center,
+                          aIPropmpt,
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.w600),
+                        ),
+                        MainWidgets(
+                            mainWidgetData: weatherProvider.mainWidgetData),
+                        const SizedBox(height: 40),
+                        HourlyTempAll(tempList: weatherProvider.tempList),
+                        const SizedBox(height: 40),
+                        DailyTempAll(
+                            dailyTempList: weatherProvider.dailyTempList),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       );
     }

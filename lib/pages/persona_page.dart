@@ -26,7 +26,7 @@ class _PersonaPageState extends State<PersonaPage> {
   void initState() {
     super.initState();
     _personaValue = widget.persona;
-
+    _politicsValue = widget.politics;
     _getPreference();
   }
 
@@ -41,7 +41,6 @@ class _PersonaPageState extends State<PersonaPage> {
 
     setState(() {
       _personaValue = prefs.getDouble("persona") ?? widget.persona;
-      _isProfanity = prefs.getBool("profanity") ?? widget.profanity;
       _politicsValue = prefs.getDouble("politics") ?? widget.politics;
       _persona = personaMap[_personaValue] ?? "";
       _politics = politicsMap[_politicsValue] ?? "";
@@ -52,7 +51,6 @@ class _PersonaPageState extends State<PersonaPage> {
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.setDouble("persona", _personaValue);
-    await prefs.setBool("profanity", _isProfanity);
     await prefs.setDouble("politics", _politicsValue);
   }
 
@@ -191,40 +189,6 @@ class _PersonaPageState extends State<PersonaPage> {
               child: Text(
                 "Choose Apolitical if you want to disable this option",
                 style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-            SizedBox(
-              height: 100,
-            ),
-            Container(
-              height: 90,
-              decoration: BoxDecoration(
-                border: Border.all(width: 2),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color.fromRGBO(126, 74, 221, 1),
-                    offset: Offset(0, 8),
-                  ),
-                ],
-                borderRadius: BorderRadius.circular(15.0),
-                color: const Color.fromRGBO(140, 190, 233, 1),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(
-                    "Profanity",
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  Switch(
-                      value: _isProfanity,
-                      onChanged: (value) {
-                        setState(() {
-                          _isProfanity = value;
-                          _setPreference();
-                        });
-                      })
-                ],
               ),
             ),
             SizedBox(
