@@ -38,6 +38,7 @@ class WeatherDataProvider extends ChangeNotifier {
       final uri = Uri.parse("https://api.openweathermap.org/data/2.5/weather")
           .replace(queryParameters: queryParams);
       final response = await http.get(uri);
+      print("current weather :" + response.body);
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
@@ -72,7 +73,7 @@ class WeatherDataProvider extends ChangeNotifier {
             .replace(queryParameters: queryParams);
 
     final response = await http.get(uri);
-
+    print("hourly weather :" + response.body);
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
 
@@ -107,7 +108,7 @@ class WeatherDataProvider extends ChangeNotifier {
             .replace(queryParameters: queryParams);
 
     final response = await http.get(uriDaily);
-
+    print("Daily weather :" + response.body);
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
 

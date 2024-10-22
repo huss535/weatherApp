@@ -20,8 +20,6 @@ class _PersonaPageState extends State<PersonaPage> {
   late String _politics;
   late double _politicsValue;
 
-  late bool _isProfanity;
-
   @override
   void initState() {
     super.initState();
@@ -187,7 +185,7 @@ class _PersonaPageState extends State<PersonaPage> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                "Choose Apolitical if you want to disable this option",
+                "Choose Neutral if you want to disable this option",
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
             ),

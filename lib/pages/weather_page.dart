@@ -29,14 +29,14 @@ class _WeatherPageState extends State<WeatherPage> {
     TextPart prompt;
     final prefs = await SharedPreferences.getInstance();
     final String persona = personaMap[prefs.getDouble("persona")]!;
-    final String politics = personaMap[prefs.getDouble("politics")]!;
+    final String politics = politicsMap[prefs.getDouble("politics")]!;
     final String weather = mainWidgetData.weatherInfo;
     final String temp = mainWidgetData.temp;
     final String location = mainWidgetData.locationName;
 
     prompt = TextPart(
-        "Generate a fun message for a user of a weather app keeping it within 2 sentences, Step into the persona of ${persona} with a ${politics} stance to give this message. Use the information as well, the user is currently in ${location}, where the temperature is ${temp}°C, and the weather condition is ${weather}. Provide a concise update that reflects their character and approach and make it a fun, engaging experience for the user.");
-    print(weather);
+        "Generate a fun message for a user of a weather app keeping it within 2 sentences, Step into the persona of $persona  who happens to be $politics to give this message keeping it with in saftey guidlines. Use the information as well, the user is currently in $location, where the temperature is $temp°C, and the weather condition is $weather. Provide a concise update that reflects their character and approach and make it a fun, engaging experience for the user.");
+    print(persona);
     print(prompt.text);
     final response = await model.generateContent([
       Content.multi([prompt])
