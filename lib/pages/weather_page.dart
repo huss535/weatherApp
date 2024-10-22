@@ -35,7 +35,8 @@ class _WeatherPageState extends State<WeatherPage> {
     final String location = mainWidgetData.locationName;
 
     prompt = TextPart(
-        "Generate a fun message for a user of a weather app keeping it within 2 sentences, Step into the persona of $persona  who happens to be $politics to give this message keeping it with in saftey guidlines. Use the information as well, the user is currently in $location, where the temperature is $temp°C, and the weather condition is $weather. Provide a concise update that reflects their character and approach and make it a fun, engaging experience for the user.");
+        "Craft a whimsical and engaging weather update in just two sentences, fully embodying the persona of $persona. Capture their current mood of $politics, and deliver the message in their distinctive voice. The user is currently in $location, where the temperature is  $temp°C with $weather conditions. Infuse the update with $persona's unique quirks and worldview, transforming this weather report into a delightful and character-driven experience.");
+
     print(persona);
     print(prompt.text);
     final response = await model.generateContent([
@@ -97,7 +98,7 @@ class _WeatherPageState extends State<WeatherPage> {
                         Text(
                           textAlign: TextAlign.center,
                           aIPropmpt,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 15, fontWeight: FontWeight.w600),
                         ),
                         MainWidgets(

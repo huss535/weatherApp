@@ -55,25 +55,6 @@ class _PersonaPageState extends State<PersonaPage> {
   @override
   Widget build(BuildContext context) {
     // Check if _personaValue is null, and show a loading indicator if needed
-    if (_personaValue == null) {
-      return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context, _persona);
-            },
-          ),
-          title: Text("Persona"),
-          backgroundColor: Colors.deepPurple,
-          elevation: 30.0,
-        ),
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -91,7 +72,7 @@ class _PersonaPageState extends State<PersonaPage> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                "Personality",
+                "Character",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
@@ -138,7 +119,7 @@ class _PersonaPageState extends State<PersonaPage> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                "Politics",
+                "Personality",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,

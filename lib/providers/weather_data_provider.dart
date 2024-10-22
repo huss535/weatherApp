@@ -13,6 +13,8 @@ class WeatherDataProvider extends ChangeNotifier {
 
   //used primarily for UI
   bool isLoading = true;
+  var dailyWeatherData;
+  var hourlyWeatherData;
 
 // Getter function for current location coordinates.
   List<String> getCoordinates() {
@@ -35,18 +37,25 @@ class WeatherDataProvider extends ChangeNotifier {
         'units': "metric",
         'appid': dotenv.env["WEATHER_API_KEY"],
       };
-      final uri = Uri.parse("https://api.openweathermap.org/data/2.5/weather")
+      final uri = Uri.parse("https://api.openweathermap.org/data/3.0/onecall")
           .replace(queryParameters: queryParams);
-      final response = await http.get(uri);
-      print("current weather :" + response.body);
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
 
-        mainWidgetData.temp = data["main"]["temp"].round().toString();
-        mainWidgetData.weatherInfo = data["weather"][0]["description"];
-        mainWidgetData.windSpeed = data["wind"]["speed"].toString();
-        mainWidgetData.iconCode = data["weather"][0]["icon"];
-        print(mainWidgetData.weatherInfo);
+      final response = await http.get(uri);
+      print("Current Weather (Body): ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        //setting array of hourly temprature data
+        hourlyWeatherData = data["hourly"];
+        dailyWeatherData = data["daily"];
+
+        mainWidgetData.temp = data["current"]["temp"].round().toString();
+        mainWidgetData.weatherInfo =
+            data["current"]["weather"][0]["description"];
+        mainWidgetData.windSpeed = data["current"]["wind_speed"].toString();
+        mainWidgetData.iconCode = data["current"]["weather"][0]["icon"];
+        /* print("Current weather data set:" + mainWidgetData.temp); */
         notifyListeners();
         // Reverting to current location after displaying searched location weather
       } else {
@@ -60,7 +69,7 @@ class WeatherDataProvider extends ChangeNotifier {
   }
 
   Future<void> _fetchHourlyTemp() async {
-    print("Hourly API called");
+    /*  print("Hourly API called");
     final queryParams = {
       'lat': _lat,
       'lon': _long,
@@ -73,22 +82,20 @@ class WeatherDataProvider extends ChangeNotifier {
             .replace(queryParameters: queryParams);
 
     final response = await http.get(uri);
-    print("hourly weather :" + response.body);
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body);
-
-      final List<dynamic> hourlyData = jsonData['list'];
+    print("hourly weather :" + response.body); */
+    if (hourlyWeatherData.length > 0) {
       tempList.clear();
-      print(hourlyData.length);
+      //print(hourlyWeatherData.length);
       for (int i = 0; i < 24; i++) {
         HourlyTempData entry = HourlyTempData(
-          temp: hourlyData[i]["main"]["temp"].round().toString(),
-          hour: formatTimestamp(hourlyData[i]["dt"]),
-          iconCode: hourlyData[i]["weather"][0]["icon"].toString(),
+          temp: hourlyWeatherData[i]["temp"].round().toString(),
+          hour: formatTimestamp(hourlyWeatherData[i]["dt"]),
+          iconCode: hourlyWeatherData[i]["weather"][0]["icon"].toString(),
         );
 
         tempList.add(entry);
       }
+
       notifyListeners();
     } else {
       throw Exception('Failed to load hourly temperature');
@@ -96,32 +103,15 @@ class WeatherDataProvider extends ChangeNotifier {
   }
 
   Future<void> _fetchDailyTemp() async {
-    final queryParams = {
-      'lat': _lat,
-      'lon': _long,
-      'units': "metric",
-      'appid': dotenv.env["WEATHER_API_KEY"],
-    };
-
-    final uriDaily =
-        Uri.parse("https://api.openweathermap.org/data/2.5/forecast/daily")
-            .replace(queryParameters: queryParams);
-
-    final response = await http.get(uriDaily);
-    print("Daily weather :" + response.body);
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body);
-
-      final List<dynamic> dailyData = jsonData['list'];
-
+    if (dailyWeatherData.length > 0) {
       dailyTempList.clear();
       for (int i = 0; i < 7; i++) {
         DailyTempData entry = DailyTempData(
-          tempMin: dailyData[i]["temp"]["min"].round().toString(),
-          tempMax: dailyData[i]["temp"]["max"].round().toString(),
-          dayOfWeek: getDayOfWeek(
-              DateTime.fromMillisecondsSinceEpoch(dailyData[i]["dt"] * 1000)),
-          iconCode: dailyData[i]["weather"][0]["icon"],
+          tempMin: dailyWeatherData[i]["temp"]["min"].round().toString(),
+          tempMax: dailyWeatherData[i]["temp"]["max"].round().toString(),
+          dayOfWeek: getDayOfWeek(DateTime.fromMillisecondsSinceEpoch(
+              dailyWeatherData[i]["dt"] * 1000)),
+          iconCode: dailyWeatherData[i]["weather"][0]["icon"],
         );
         dailyTempList.add(entry);
       }
@@ -167,7 +157,7 @@ class WeatherDataProvider extends ChangeNotifier {
 
         http.Response response = await http.get(coordinatesCall);
         if (response.statusCode == 200) {
-          Map<String, dynamic> data = jsonDecode(response.body);
+          var data = jsonDecode(response.body);
           _lat = data["result"]["geometry"]["location"]["lat"].toString();
           _long = data["result"]["geometry"]["location"]["lng"].toString();
         } else {

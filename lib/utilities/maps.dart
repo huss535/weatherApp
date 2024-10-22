@@ -1,17 +1,17 @@
 Map<double, String> personaMap = {
   0.0: "None",
-  20.00: "Chandler Bing",
-  40.00: "NoHo Hank",
+  20.00: "Ace Ventura",
+  40.00: "Stefon",
   60.00: "Deadpool",
-  80.00: "Darth Vader",
-  100.0: "King Joffrey"
+  80.00: "Ron Swanson",
+  100.0: "Moira Rose"
 };
 
 Map<double, String> politicsMap = {
   0.0: "Neutral",
-  20.00: "Depressed",
-  40.00: "Sad",
-  60.00: "High",
-  80.00: "Happy",
-  100.0: "Manic"
+  20.00: "Cheerful",
+  40.00: "Sarcastic",
+  60.00: "Needy",
+  80.00: "Dramatic",
+  100.0: "Aggressive"
 };
