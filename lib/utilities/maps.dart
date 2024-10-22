@@ -13,5 +13,5 @@ Map<double, String> politicsMap = {
   40.00: "Sarcastic",
   60.00: "Needy",
   80.00: "Dramatic",
-  100.0: "Aggressive"
+  100.0: "Affirming"
 };

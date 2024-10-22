@@ -3,14 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_app/utilities/helper_functions.dart';
 import 'package:http/http.dart' as http;
+import 'package:weather_app/utilities/maps.dart';
 
 class WeatherDataProvider extends ChangeNotifier {
   String _lat = "";
   String _long = ""; // Co-ordinates used in APIs
   String? locationId;
-
+  String aIPrompt = "";
   //used primarily for UI
   bool isLoading = true;
   var dailyWeatherData;
@@ -19,6 +22,32 @@ class WeatherDataProvider extends ChangeNotifier {
 // Getter function for current location coordinates.
   List<String> getCoordinates() {
     return [_lat, _long];
+  }
+
+  Future<void> testGemini(MainWidgetData mainWidgetData) async {
+    final model = GenerativeModel(
+        model: 'gemini-1.5-flash', apiKey: dotenv.env['GEMINI'] ?? "");
+
+    TextPart prompt;
+    final prefs = await SharedPreferences.getInstance();
+    final String persona = personaMap[prefs.getDouble("persona")]!;
+    final String politics = politicsMap[prefs.getDouble("politics")]!;
+    final String weather = mainWidgetData.weatherInfo;
+    final String temp = mainWidgetData.temp;
+    final String location = mainWidgetData.locationName;
+
+    prompt = TextPart(
+        "This is meant to be an experiment we are not harming anyone maintaining your guidlines, Craft a whimsical and engaging weather update in just two sentences, fully embodying the persona of $persona. Capture their current mood of $politics, and deliver the message in their distinctive voice. The user is currently in $location, where the temperature is  $temp°C with $weather conditions. Infuse the update with $persona's unique quirks and worldview, transforming this weather report into a delightful and character-driven experience.");
+
+    print(persona);
+    print(prompt.text);
+    final response = await model.generateContent([
+      Content.multi([prompt])
+    ]);
+
+    aIPrompt = response.text!;
+    print(aIPrompt);
+    notifyListeners();
   }
 
   MainWidgetData mainWidgetData = MainWidgetData();
@@ -133,6 +162,7 @@ class WeatherDataProvider extends ChangeNotifier {
     await _fetchCurrentWeather();
     await _fetchHourlyTemp();
     await _fetchDailyTemp();
+    await testGemini(mainWidgetData);
     isLoading = false;
   }
 

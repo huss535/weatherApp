@@ -23,9 +23,9 @@ class WeatherPage extends StatefulWidget {
 }
 
 class _WeatherPageState extends State<WeatherPage> {
-  String aIPropmpt = "No Comment";
+  /*  String aIPropmpt = "No Comment"; */
 
-  Future<void> testGemini(MainWidgetData mainWidgetData) async {
+  /* Future<void> testGemini(MainWidgetData mainWidgetData) async {
     TextPart prompt;
     final prefs = await SharedPreferences.getInstance();
     final String persona = personaMap[prefs.getDouble("persona")]!;
@@ -45,7 +45,7 @@ class _WeatherPageState extends State<WeatherPage> {
     setState(() {
       aIPropmpt = response.text!;
     });
-  }
+  } */
 
   @override
   void initState() {
@@ -53,8 +53,8 @@ class _WeatherPageState extends State<WeatherPage> {
     final weatherProvider =
         Provider.of<WeatherDataProvider>(context, listen: false);
 
-    testGemini(weatherProvider
-        .mainWidgetData); // Call function to initialize Gemini data asynchronously
+    /*   testGemini(weatherProvider
+        .mainWidgetData); // Call function to initialize Gemini data asynchronously */
   }
 
   /* @override
@@ -84,37 +84,34 @@ class _WeatherPageState extends State<WeatherPage> {
           backgroundColor: Colors.deepPurple,
           elevation: 30.0,
         ),
-        body: RefreshIndicator(
-          onRefresh: () => testGemini(weatherProvider.mainWidgetData),
-          child: Consumer<WeatherDataProvider>(
-            builder: (context, weatherProvider, _) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Center(
-                  child: SizedBox(
-                    width: 380,
-                    child: ListView(
-                      children: [
-                        Text(
-                          textAlign: TextAlign.center,
-                          aIPropmpt,
-                          style: const TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.w600),
-                        ),
-                        MainWidgets(
-                            mainWidgetData: weatherProvider.mainWidgetData),
-                        const SizedBox(height: 40),
-                        HourlyTempAll(tempList: weatherProvider.tempList),
-                        const SizedBox(height: 40),
-                        DailyTempAll(
-                            dailyTempList: weatherProvider.dailyTempList),
-                      ],
-                    ),
+        body: Consumer<WeatherDataProvider>(
+          builder: (context, weatherProvider, _) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Center(
+                child: SizedBox(
+                  width: 380,
+                  child: ListView(
+                    children: [
+                      Text(
+                        textAlign: TextAlign.center,
+                        weatherProvider.aIPrompt,
+                        style: const TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w600),
+                      ),
+                      MainWidgets(
+                          mainWidgetData: weatherProvider.mainWidgetData),
+                      const SizedBox(height: 40),
+                      HourlyTempAll(tempList: weatherProvider.tempList),
+                      const SizedBox(height: 40),
+                      DailyTempAll(
+                          dailyTempList: weatherProvider.dailyTempList),
+                    ],
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       );
     }
